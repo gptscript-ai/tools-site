@@ -1,8 +1,9 @@
 {
-  "name": "tmp",
+  "name": "gptscript-dev",
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "local": "docker compose up",
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
@@ -15,6 +16,7 @@
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.25.3",
     "nuxt": "^2.15.8",
+    "pg": "^8.11.3",
     "vue": "^2.7.10",
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10"
@@ -26,6 +28,7 @@
     "@nuxtjs/eslint-config-typescript": "^11.0.0",
     "@nuxtjs/eslint-module": "^3.1.0",
     "@nuxtjs/tailwindcss": "^6",
+    "@types/pg": "^8.11.2",
     "eslint": "^8.24.0",
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-vue": "^9.5.1",

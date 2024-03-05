@@ -1,20 +1,18 @@
-# Use an official Node.js runtime as the base image
-FROM node:14
+# when editing and using docker compose, make sure 
+# to run `docker compose build --no-cache` to rebuild
+# the image and not use the cache.
 
-# Set the working directory in the container to /app
+FROM node:20 as dev
 WORKDIR /app
-
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-
-# Install the application dependencies
-RUN npm install
-
-# Copy the rest of the application code to the working directory
+ENV NUXT_PORT=3000
+ENV NODE_ENV=development
 COPY . .
-
-# Make port 3000 available outside the container
+RUN yarn install
 EXPOSE 3000
+CMD [ "yarn", "dev" ]
 
-# Define the command to run the application
-CMD [ "npm", "start" ]
+FROM node:20 as prod
+WORKDIR /app
+COPY --from=dev /app .
+RUN yarn build
+CMD [ "yarn", "start" ]
