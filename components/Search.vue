@@ -4,7 +4,7 @@
       <input
         v-model="searchTerm"
         type="text"
-        placeholder="Search..."
+        :placeholder="placeholder"
         :class="`w-full px-4 py-2 text-gray-700 bg-white border ${isInvalid ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:border-blue-500`"
       />
       <p v-if="isInvalid" class="text-red-500">{{ errorMessage }}</p>
@@ -18,7 +18,8 @@ import { useRouter } from 'vue-router';
 
 const props = defineProps({
   isInvalid: Boolean,
-  errorMessage: String
+  errorMessage: String,
+  placeholder: String // Added placeholder prop
 });
 
 const searchTerm = ref('');
