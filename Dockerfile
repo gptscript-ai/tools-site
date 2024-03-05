@@ -4,8 +4,6 @@
 
 FROM node:20 as dev
 WORKDIR /app
-ENV NUXT_PORT=3000
-ENV NODE_ENV=development
 COPY . .
 RUN yarn install
 EXPOSE 3000
