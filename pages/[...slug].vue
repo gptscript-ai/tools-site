@@ -1,21 +1,11 @@
 <template>
-  <div class="flex flex-col items-center justify-center mt-8">
-    <h1 class="text-4xl font-bold mb-4">GitHub URL</h1>
-    <pre class="text-lg">URL: {{ githubUrl }}</pre>
-
-    <div class="container">
-      <div class="mt-8 mx-auto element border border-gray-300 rounded-md p-4">
-        <h2 class="text-2xl font-bold">tool.gpt</h2>
-        <div class="overflow-auto max-h-96">
-          <pre class="bg-gray-200 p-4 mb-4 text-sm whitespace-pre-wrap">{{ toolFileData }}</pre>
-        </div>
-      </div>
-
-      <div class="mt-8 mx-auto element border border-gray-300 rounded-md p-4">
-        <h2 class="text-2xl font-bold">README.md</h2>
-        <div class="overflow-auto max-h-96 mx-4">
-          <Markdown :markdown="readmeData" />
-        </div>
+  <div class="flex flex-col mt-24 mx-24">
+    <a :href="githubUrl ? `https://${githubUrl}` : ''" target="_blank" class="text-blue-500 underline">{{ githubUrl }}</a>
+    <Markdown :markdown="readmeData" />
+    <div class="mt-8">
+      <h2 class="text-2xl font-bold">tool.gpt</h2>
+      <div class="overflow-auto max-h-96">
+        <pre class="bg-gray-200 p-4 mb-4 text-sm whitespace-pre-wrap">{{ toolFileData }}</pre>
       </div>
     </div>
   </div>
