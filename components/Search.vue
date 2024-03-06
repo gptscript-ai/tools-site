@@ -19,7 +19,7 @@ import { useRouter } from 'vue-router';
 const props = defineProps({
   isInvalid: Boolean,
   errorMessage: String,
-  placeholder: String // Added placeholder prop
+  placeholder: String,
 });
 
 const searchTerm = ref('');

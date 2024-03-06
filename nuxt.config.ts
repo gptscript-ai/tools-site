@@ -8,4 +8,10 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  runtimeConfig: {
+    // todo: the github call has to be moved to the server side
+    public: {
+      githubToken: '', // NUXT_PUBLIC_GITHUB_TOKEN
+    },
+  },
 })

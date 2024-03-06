@@ -1,75 +1,31 @@
-# Nuxt 3 Minimal Starter
+# pkg-gptscript
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This project is a Nuxt 3 application for serving documentation for various tools in the gptscript ecosystem.
 
 ## Setup
+To get started locally, follow these steps:
 
-Make sure to install the dependencies:
+1. Clone this repository:
 
-```bash
-# npm
-npm install
+    ```bash
+    git clone https://github.com/yourusername/yourrepository.git
+    ```
 
-# pnpm
-pnpm install
+2. Install the dependencies:
 
-# yarn
-yarn install
 
-# bun
-bun install
-```
+    ```bash
+    yarn install
+    ```
 
-## Development Server
+3. Create a .env file in the root of your project and add your GitHub token:
 
-Start the development server on `http://localhost:3000`:
+    ```bash
+    GITHUB_TOKEN=your_github_token
+    ```
 
-```bash
-# npm
-npm run dev
+4. Start the development server:
 
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+    ```bash
+    yarn dev
+    ```

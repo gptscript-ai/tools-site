@@ -11,9 +11,6 @@
 <script setup>
 import { links } from '@/lib/links.ts';
 import { ref } from 'vue';
-
-console.log(links)
-
 const githubLink = ref(links.github);
 const docsLink = ref(links.docs);
 </script>
