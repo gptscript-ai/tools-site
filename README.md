@@ -8,11 +8,10 @@ To get started locally, follow these steps:
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/yourusername/yourrepository.git
+    git clone https://github.com/gptscript-ai/pkg-gptscript.git
     ```
 
 2. Install the dependencies:
-
 
     ```bash
     yarn install
