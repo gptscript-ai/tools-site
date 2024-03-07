@@ -9,9 +9,6 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    // todo: the github call has to be moved to the server side
-    public: {
-      githubToken: '', // NUXT_PUBLIC_GITHUB_TOKEN
-    },
+    githubToken: '', // NUXT_PUBLIC_GITHUB_TOKEN
   },
 })

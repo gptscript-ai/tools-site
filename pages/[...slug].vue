@@ -5,46 +5,52 @@
     <div class="mt-8">
       <h2 class="text-2xl font-bold">tool.gpt</h2>
       <div class="overflow-auto max-h-96">
-        <pre class="bg-gray-200 p-4 mb-4 text-sm whitespace-pre-wrap">{{ toolFileData }}</pre>
+        <Markdown :markdown="toolData" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { fetchGithubFile } from '@/lib/github'; // Import the fetchGithubFile function
+import { base64Decode } from '@/lib/decode';
 
-const route = useRoute();
-const router = useRouter();
-
-const path = route.path.replace(/^\//, ''); // Strip the leading slash
-
-const githubUrl = computed(() => {
-  const githubRepoRegex = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/;
-
-  if (githubRepoRegex.test(path)) {
-    return path;
-  }
-  return null;
-});
-
-const toolFileData = ref('');
+const toolData = ref('');
 const readmeData = ref('');
+const githubUrl = ref('');
 
 onMounted(async () => {
-  routeIfInvalid();
-
-  const [owner, repo] = path.split('/').slice(-2);
-  toolFileData.value = await fetchGithubFile(owner, repo, 'tool.gpt');
-  readmeData.value = await fetchGithubFile(owner, repo, 'README.md');
+  loadData();
 });
 
-const routeIfInvalid = () => {
-  if (!githubUrl.value) {
+onBeforeMount(async () => {
+  loadData();
+});
+
+async function loadData() {
+  const route = useRoute();
+  const router = useRouter();
+
+  const path = route.path.replace(/^\//, '');
+  const validRepo = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/.test(path);
+
+  if (!validRepo) {
     router.push({ path: '/404', query: { isInvalid: 'true' } });
   }
-}
+  githubUrl.value = path;
 
-</script>~/lib/github
+  const [owner, repo] = path.split('/').slice(-2);
+  try {
+    const [toolResponse, readmeResponse] = await Promise.all([
+      useFetch(`/api/github?owner=${owner}&repo=${repo}&path=tool.gpt`),
+      useFetch(`/api/github?owner=${owner}&repo=${repo}&path=README.md`),
+    ]);
+
+    toolData.value = base64Decode(toolResponse.data.value ?? '');
+    readmeData.value = base64Decode(readmeResponse.data.value ?? '');
+  } catch (error) {
+    throw error;
+  }
+}
+</script>
