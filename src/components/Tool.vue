@@ -18,7 +18,6 @@
                 <p v-for="(usedTool) in tool.tools" :key="usedTool">{{ usedTool }}</p>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -51,4 +50,4 @@ try {
   console.error(error);
 }
 
-</script>
+</script>~/src/lib/types

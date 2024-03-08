@@ -20,3 +20,4 @@ const placeHolder = ref('Search for a GPTScript Tool...');
 const githubLink = ref(links.github);
 const docsLink = ref(links.docs);
 </script>
+~/src/lib/links
