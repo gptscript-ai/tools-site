@@ -16,7 +16,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import Search from '@/components/Search.vue'; // Import the Search component from the correct location
 
 const route = useRoute();
 const isInvalid = ref(false);
