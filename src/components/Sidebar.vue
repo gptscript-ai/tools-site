@@ -38,7 +38,6 @@ const fetchHeaders = () => {
                 headers: [],
                 isOpen: false
             };
-            console.log(header.id)
             groups.push(group);
         } else if (header.tagName === 'H4' && groups.length > 0) {
             const group = groups[groups.length - 1];
