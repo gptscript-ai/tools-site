@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-sm mx-auto">
+  <div class="w-full mx-auto">
     <form @submit.prevent="submitSearch">
       <div class="relative">
         <input

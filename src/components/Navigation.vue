@@ -1,11 +1,11 @@
 <template>
-  <nav class="bg-blue-500 p-4 flex justify-between">
+  <nav class="navbar bg-blue-500 p-4 flex justify-between items-center">
     <ul class="flex space-x-4">
       <li><nuxt-link to="/" class="text-white hover:text-blue-200">Home</nuxt-link></li>
       <li><a :href="githubLink" class="text-white hover:text-blue-200">GitHub</a></li>
       <li><a :href="docsLink" class="text-white hover:text-blue-200">Docs</a></li>
     </ul>
-    <div class="flex w-96">
+    <div class="flex w-full mx-4">
       <Search :placeholder="placeHolder" />
     </div>
   </nav>
@@ -20,4 +20,3 @@ const placeHolder = ref('Search for a GPTScript Tool...');
 const githubLink = ref(links.github);
 const docsLink = ref(links.docs);
 </script>
-~/src/lib/links
