@@ -8,7 +8,4 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  runtimeConfig: {
-    githubToken: '', // NUXT_PUBLIC_GITHUB_TOKEN
-  },
 })

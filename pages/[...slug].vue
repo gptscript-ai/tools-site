@@ -1,24 +1,17 @@
 <template>
-  <div class="flex flex-col mt-24 mx-24">
-    <a :href="githubUrl ? `https://${githubUrl}` : ''" target="_blank" class="text-blue-500 underline">{{ githubUrl }}</a>
-    <Markdown :markdown="readmeData" />
-    <div class="mt-8">
-      <h2 class="text-2xl font-bold">tool.gpt</h2>
-      <div class="overflow-auto max-h-96">
-        <Markdown :markdown="toolData" />
-      </div>
-    </div>
+  <div class="flex flex-col mt-16 mx-24">
+    <Tool class="w-3/4" :tools="tools" :title="title" :githubUrl="githubUrl"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { base64Decode } from '@/lib/decode';
+import type { Tool } from '@/lib/types';
 
-const toolData = ref('');
-const readmeData = ref('');
+const tools = ref([] as Tool[])
 const githubUrl = ref('');
+const title = ref('')
 
 onMounted(async () => {
   loadData();
@@ -28,7 +21,7 @@ onBeforeMount(async () => {
   loadData();
 });
 
-async function loadData() {
+const loadData = async () => {
   const route = useRoute();
   const router = useRouter();
 
@@ -41,16 +34,22 @@ async function loadData() {
   githubUrl.value = path;
 
   const [owner, repo] = path.split('/').slice(-2);
-  try {
-    const [toolResponse, readmeResponse] = await Promise.all([
-      useFetch(`/api/github?owner=${owner}&repo=${repo}&path=tool.gpt`),
-      useFetch(`/api/github?owner=${owner}&repo=${repo}&path=README.md`),
-    ]);
+  title.value = repo;
 
-    toolData.value = base64Decode(toolResponse.data.value ?? '');
-    readmeData.value = base64Decode(readmeResponse.data.value ?? '');
+  try {
+    const toolResponse = await useFetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/tool.gpt`);
+    const parserResponse = await fetch("http://localhost:8080", {
+      method: 'POST',
+      body: toolResponse.data.value as string,
+      headers: {
+        'Content-Type': 'text/plain',
+      }
+    });
+    const parserResponseBody = await parserResponse.text();
+    const parsedTools = JSON.parse(parserResponseBody) as Tool[];
+    tools.value = parsedTools;
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 }
 </script>

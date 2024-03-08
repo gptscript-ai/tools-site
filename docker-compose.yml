@@ -17,6 +17,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=mydatabase
+      - PARSER_URL=http://parser:8080
   db:
     image: postgres:16.2
     environment:
@@ -25,5 +26,10 @@ services:
       POSTGRES_DB: mydatabase
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+  parser:
+    build:
+      context: ./parser
+    ports:
+      - "8080:8080"
 volumes:
   postgres_data:

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "local": "docker compose up",
+    "local": "docker compose up --build",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

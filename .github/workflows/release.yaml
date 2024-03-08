@@ -7,7 +7,7 @@ on:
     - v*
 
 jobs:
-  build_push:
+  build_push_app:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repo
@@ -27,3 +27,22 @@ jobs:
         push: true
         tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
 
+  build_push_parser:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v3 
+
+    - name: Login to ghcr.io
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push the image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/${{ github.repository }}/parser:${{ github.ref_name }}

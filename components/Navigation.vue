@@ -5,7 +5,7 @@
       <li><a :href="githubLink" class="text-white hover:text-blue-200">GitHub</a></li>
       <li><a :href="docsLink" class="text-white hover:text-blue-200">Docs</a></li>
     </ul>
-    <div class="flex items-center w-96">
+    <div class="flex w-96">
       <Search :placeholder="placeHolder" />
     </div>
   </nav>
