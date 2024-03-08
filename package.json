@@ -1,9 +1,10 @@
 {
-  "name": "gptscript-dev",
+  "name": "pkg-gptscript",
   "private": true,
   "type": "module",
   "scripts": {
-    "local": "docker compose up --build",
+    "up": "docker compose up --build",
+    "down": "docker compose down",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

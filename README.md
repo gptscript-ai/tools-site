@@ -20,5 +20,5 @@ GITHUB_TOKEN=your_github_token
 3. Start the development environment:
 
 ```bash
-yarn local
+yarn up
 ```

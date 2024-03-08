@@ -17,7 +17,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=mydatabase
-      - PARSER_URL=http://parser:8080
+      - NUXT_PUBLIC_PARSER_URL=http://localhost:8080
   db:
     image: postgres:16.2
     environment:
@@ -29,7 +29,10 @@ services:
   parser:
     build:
       context: ./parser
+      target: dev
     ports:
       - "8080:8080"
+    volumes:
+      - ./parser:/app
 volumes:
   postgres_data:

@@ -38,7 +38,7 @@ const loadData = async () => {
 
   try {
     const toolResponse = await useFetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/tool.gpt`);
-    const parserResponse = await fetch("http://localhost:8080", {
+    const parserResponse = await fetch(useRuntimeConfig().public.parserUrl as string, {
       method: 'POST',
       body: toolResponse.data.value as string,
       headers: {

@@ -8,4 +8,9 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  runtimeConfig: {
+    public: {
+      parserUrl: '' // NUXT_PUBLIC_PARSER_URL
+    }
+  },
 })

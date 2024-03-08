@@ -1,55 +1,46 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gptscript-ai/gptscript/pkg/parser"
 )
 
 func main() {
-	http.HandleFunc("/", handleRequest)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	router := gin.Default()
+	router.ForwardedByClientIP = true
+	router.SetTrustedProxies([]string{"127.0.0.1"})
+
+	// setup middlewares
+	router.Use(corsMiddleware())
+
+	// setup routes
+	router.POST("/", handleRequest)
+
+	// start server
+	log.Fatal(router.Run(":8080"))
 }
 
-func handleRequest(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+func handleRequest(c *gin.Context) {
+	parsedScript, err := parser.Parse(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error parsing script"})
 		return
 	}
+	c.JSON(http.StatusOK, parsedScript)
+}
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Error reading request body", http.StatusInternalServerError)
-		return
-	}
-
-	parsedScript, err := parser.Parse(bytes.NewReader(body))
-	if err != nil {
-		http.Error(w, "Error parsing script", http.StatusInternalServerError)
-		return
-	}
-
-	marshalledScript, err := json.Marshal(parsedScript)
-	if err != nil {
-		http.Error(w, "Error marshalling script", http.StatusInternalServerError)
-		return
-	}
-
-	// Set Content-Type header
-	w.Header().Set("Content-Type", "application/json")
-
-	_, err = w.Write(marshalledScript)
-	if err != nil {
-		http.Error(w, "Error writing response", http.StatusInternalServerError)
-		return
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "POST")
+		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+		c.Next()
 	}
 }
