@@ -1,8 +1,8 @@
 <template>
     <div class="tool-container prose">
-        <h1 class="mb-0">{{ props.title }}</h1>
-        <a :href="githubUrl ? `https://${githubUrl}` : ''" target="_blank" class="text-blue-500 underline">{{ githubUrl }}</a>
-        <div v-for="tool in props.tools" :key="tool.id">
+        <h1 class="mb-0">{{ props.repo }}</h1>
+        <a :href="githubUrl" target="_blank" class="text-blue-500 underline">{{ githubUrl }}</a>
+        <div v-for="tool in tools" :key="tool.id">
             <h2>{{ tool.name }}</h2>
             <p class="">{{ tool.description }}</p>
 
@@ -24,18 +24,31 @@
 
 <script setup lang="ts">
 import type { Tool } from '@/lib/types';
+
 const props = defineProps({
-    title: {
-        type: String,
-        required: true
-    },
-    githubUrl: {
-        type: String,
-        required: true
-    },
-    tools: {
-        type: Array as () => Tool[],
-        required: true
-    },    
+    owner: String,
+    repo: String,
 });
+
+const tools = ref([] as Tool[])
+const githubUrl = ref('');
+
+githubUrl.value = `https://github.com/${props.owner}/${props.repo}`;
+
+try {
+  const toolResponse = await useFetch(`https://raw.githubusercontent.com/${props.owner}/${props.repo}/main/tool.gpt`);
+  const parserResponse = await fetch(useRuntimeConfig().public.parserUrl as string, {
+    method: 'POST',
+    body: toolResponse.data.value as string,
+    headers: {
+      'Content-Type': 'text/plain',
+    }
+  });
+  const parserResponseBody = await parserResponse.text();
+  const parsedTools = JSON.parse(parserResponseBody) as Tool[];
+  tools.value = parsedTools;
+} catch (error) {
+  console.error(error);
+}
+
 </script>

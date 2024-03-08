@@ -1,55 +1,28 @@
 <template>
   <div class="flex flex-col mt-16 mx-24">
-    <Tool class="w-3/4" :tools="tools" :title="title" :githubUrl="githubUrl"/>
+    <Tool class="w-3/4" :owner="owner" :repo="repo"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+// todo: this calls the endpoint twice. the first time fails and the second succeeds.
+//       at the time of writing this comment, I don't know why. This likely has something
+//       to do with the lifecycle of the component since putting this behind onMounted
+//       causes there to be no data at all.
+import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { Tool } from '@/lib/types';
 
-const tools = ref([] as Tool[])
-const githubUrl = ref('');
-const title = ref('')
+const route = useRoute();
+const router = useRouter();
+const owner = ref('');
+const repo = ref('');
 
-onMounted(async () => {
-  loadData();
-});
+const path = route.path.replace(/^\//, '');
+const validRepo = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/.test(path);
 
-onBeforeMount(async () => {
-  loadData();
-});
-
-const loadData = async () => {
-  const route = useRoute();
-  const router = useRouter();
-
-  const path = route.path.replace(/^\//, '');
-  const validRepo = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/.test(path);
-
-  if (!validRepo) {
-    router.push({ path: '/404', query: { isInvalid: 'true' } });
-  }
-  githubUrl.value = path;
-
-  const [owner, repo] = path.split('/').slice(-2);
-  title.value = repo;
-
-  try {
-    const toolResponse = await useFetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/tool.gpt`);
-    const parserResponse = await fetch(useRuntimeConfig().public.parserUrl as string, {
-      method: 'POST',
-      body: toolResponse.data.value as string,
-      headers: {
-        'Content-Type': 'text/plain',
-      }
-    });
-    const parserResponseBody = await parserResponse.text();
-    const parsedTools = JSON.parse(parserResponseBody) as Tool[];
-    tools.value = parsedTools;
-  } catch (error) {
-    console.error(error);
-  }
+if (!validRepo) {
+  router.push({ path: '/404' });
 }
+
+[owner.value, repo.value] = path.split('/').slice(-2);
 </script>
