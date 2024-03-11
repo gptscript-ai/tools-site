@@ -1,9 +1,11 @@
 <template>
-  <div class="flex mt-16 mx-24">
-    <div class="hidden md:block">
-      <Sidebar class="mr-24 sticky top-8"/>
+  <div class="flex">
+    <div class="hidden md:block border-r border-gray-200">
+      <Sidebar class="mx-20 sticky top-8 pt-10"/>
     </div>
-    <Tool :owner="owner" :repo="repo"/>
+    <div class="pt-10 mx-auto w-auto sm:mx-20">
+      <Tool :owner="owner" :repo="repo"/>
+    </div>
   </div>
 </template>
 

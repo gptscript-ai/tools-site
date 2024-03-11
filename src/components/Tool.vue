@@ -7,11 +7,14 @@
             <p class="">{{ tool.description }}</p>
 
             <h3 :id="tool+ '-arguments'">Arguments</h3>
-            <div v-for="(properties, arg) in tool.arguments?.properties" :key="arg">
-                <h4 :id="tool.name + '-arg-' + arg" class="mb-0">{{ arg }}</h4>
-                <p class="text-gray-500" v-if="properties.type">{{ properties.type }}</p>
-                <p v-if="properties.description">{{ properties.description }}</p>   
-            </div>
+            <table>
+              <tbody>
+                <tr v-for="(properties, arg) in tool.arguments?.properties" :key="arg">
+                  <td class="font-semibold">{{ arg }}</td>
+                  <td class="">{{ properties.description }}</td>
+                </tr>
+              </tbody>
+            </table>
 
             <h3 v-if="tool.tools && tool.tools.length" :id="tool.name + 'tools-used'">Tools used</h3>
             <div v-if="tool.tools && tool.tools.length">
