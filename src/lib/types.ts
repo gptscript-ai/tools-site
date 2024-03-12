@@ -16,14 +16,14 @@ export interface Tool {
     localTools?: { [key: string]: string };
     source?: ToolSource;
     workingDir?: string;
-  }
-  
-  interface ToolSource {
+}
+
+interface ToolSource {
     location?: string;
     lineNo?: number;
-  }
-  
-  interface JSONSchema {
+}
+
+interface JSONSchema {
     property: Property;
     id?: string;
     title?: string;
@@ -31,11 +31,11 @@ export interface Tool {
     required?: string[];
     defs?: { [key: string]: JSONSchema };
     additionalProperties?: boolean;
-  }
-  
-  interface Property {
+}
+
+interface Property {
     description?: string;
     type?: string;
     ref?: string;
     items?: JSONSchema[];
-  }
+}
