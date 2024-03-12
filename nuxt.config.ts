@@ -10,6 +10,8 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    databaseUrl: '', // NUXT_DATABASE_URL
+    parserUrl: '', // NUXT_PARSER_URL
     public: {
       parserUrl: '' // NUXT_PUBLIC_PARSER_URL
     }

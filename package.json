@@ -7,15 +7,18 @@
     "down": "docker compose down",
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:migrate": "npx prisma migrate deploy && yarn dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "start": "nuxt start"
+    "start": "nuxt start",
+    "start:migrate": "npx prisma migrate deploy && yarn start"
   },
   "dependencies": {
     "@octokit/core": "^6.0.1",
+    "@prisma/client": "^5.11.0",
     "nuxt": "^3.10.3",
-    "pg": "^8.11.3",
+    "sequelize": "^6.37.1",
     "vue": "^3.4.19",
     "vue-router": "^4.3.0"
   },
@@ -25,6 +28,7 @@
     "@types/pg": "^8.11.2",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
+    "prisma": "^5.11.0",
     "tailwindcss": "^3.4.1"
   }
 }

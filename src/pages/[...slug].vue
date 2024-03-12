@@ -4,7 +4,7 @@
       <Sidebar class="mx-20 sticky top-8 pt-10"/>
     </div>
     <div class="pt-10 mx-auto w-auto sm:mx-20">
-      <Tool :owner="owner" :repo="repo"/>
+      <Tool :owner="owner" :path="path"/>
     </div>
   </div>
 </template>
@@ -20,14 +20,14 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const owner = ref("");
-const repo = ref("");
+const path = ref("");
 
-const path = route.path.replace(/^\//, "");
-const validRepo = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/.test(path);
+const githubURL = route.path.replace(/^\//, "");
+const validRepo = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+$/.test(githubURL);
 
 if (!validRepo) {
   router.push({ path: "/404" });
 }
 
-[owner.value, repo.value] = path.split("/").slice(-2);
+[owner.value, path.value] = githubURL.split("/").slice(-2);
 </script>

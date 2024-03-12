@@ -1,6 +1,6 @@
 <template>
     <div class="tool-container prose">
-        <h1 class="mb-0">{{ props.repo }}</h1>
+        <h1 class="mb-0">{{ props.path }}</h1>
         <a :href="githubUrl" target="_blank" class="text-blue-500 underline">{{ githubUrl }}</a>
         <div v-for="tool in tools" :key="tool.id">
             <h2 :id="'tool-' + tool.name">{{ tool.name }}</h2>
@@ -28,29 +28,18 @@
 import type { Tool } from '@/lib/types';
 
 const props = defineProps({
-    owner: String,
-    repo: String,
+  owner: String,
+  path: String,
 });
 
 const tools = ref([] as Tool[])
-const githubUrl = ref('');
-
-githubUrl.value = `https://github.com/${props.owner}/${props.repo}`;
+const githubUrl = `https://github.com/${props.owner}/${props.path}`;
 
 try {
-  const toolResponse = await useFetch(`https://raw.githubusercontent.com/${props.owner}/${props.repo}/main/tool.gpt`);
-  const parserResponse = await fetch(useRuntimeConfig().public.parserUrl as string, {
-    method: 'POST',
-    body: toolResponse.data.value as string,
-    headers: {
-      'Content-Type': 'text/plain',
-    }
-  });
-  const parserResponseBody = await parserResponse.text();
-  const parsedTools = JSON.parse(parserResponseBody) as Tool[];
-  tools.value = parsedTools;
+  // todo - some weird things at play with this response. it works but oddly.
+  const toolAPIResponse = await $fetch(`/api/github.com/${props.owner}/${props.path}`, { method: 'POST' });
+  tools.value = JSON.parse(toolAPIResponse.body as string) as Tool[];
 } catch (error) {
   console.error(error);
 }
-
 </script>

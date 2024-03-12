@@ -1,10 +1,44 @@
-import { Pool } from 'pg';
+import type { Tool } from '@/lib/types';
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+import { PrismaClient } from '@prisma/client';
 
-export const query = (text: string, params: any[]) => pool.query(text, params);
+const prisma = new PrismaClient();
+
+export const getToolsForUrl = async (url: string): Promise<Tool[]> => {
+  const toolEntry = await prisma.toolEntry.findFirst({
+    where: {
+      url: url
+    }
+  });
+
+  if (!toolEntry) {
+    return [];
+  }
+
+  return toolEntry?.content as Tool[];;
+}
+
+export const upsertToolForUrl = async (url: string, tools: Tool[]): Promise<Tool[]> => {
+  const toolEntry = await prisma.toolEntry.upsert({
+    where: {
+      url: url
+    },
+    update: {
+      content: JSON.stringify(tools)
+    },
+    create: {
+      url: url,
+      content: JSON.stringify(tools)
+    }
+  });
+  return toolEntry.content as Tool[];
+}
+
+export const removeToolForUrl = async (url: string): Promise<Tool[]> => {
+  const toolEntry = await prisma.toolEntry.delete({
+    where: {
+      url: url
+    }
+  });
+  return toolEntry.content as Tool[];
+}
