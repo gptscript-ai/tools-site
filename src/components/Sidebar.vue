@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar text-gray-600">
-        <div v-for="header in props.headers" :key="'sidebar-'+header" class="mb-4 overflow-auto">
+        <div v-for="header in props.headers" :key="'sidebar-'+header" class="mb-10 overflow-auto">
             <a :href="`#tool-${header}`">{{ header || "root" }}</a>
         </div>
     </div>
