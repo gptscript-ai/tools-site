@@ -13,7 +13,6 @@ services:
       - db
     environment:
       - HOST=0.0.0.0
-      - NUXT_PUBLIC_PARSER_URL=http://localhost:8080
       - NUXT_PARSER_URL=http://parser:8080
       - NUXT_DB_URL=postgres://postgres:postgres@db:5432/pkg-gptscript
   db:
@@ -24,8 +23,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pkg-gptscript
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
   parser:
     build:
       context: ./parser
@@ -34,5 +31,3 @@ services:
       - "8080:8080"
     volumes:
       - ./parser:/app
-volumes:
-  postgres_data:

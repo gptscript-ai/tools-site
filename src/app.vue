@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navigation />
+    <Navigation class="fixed w-full top-0 z-50"/>
     <NuxtPage />
   </div>
 </template>
