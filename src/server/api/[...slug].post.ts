@@ -13,10 +13,10 @@ export default defineEventHandler(async (event) => {
     }
     
     // if the tool is already indexed and force is not true, return the tool
-    let tools = await db.getToolsForUrl(url);
-    if (tools.tools.length > 0 && !getQuery(event).force) {
+    let entry = await db.getToolsForUrl(url);
+    if (entry.tools.length > 0 && !getQuery(event).force) {
         setResponseHeader(event, "Content-Type", "application/json");
-        return tools;
+        return entry;
     }
 
     // grab the owner, repo and subdirs from the URL if they exist
@@ -29,6 +29,10 @@ export default defineEventHandler(async (event) => {
     // fetch the tool.gpt file from github
     const toolResponse = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${toolPath}`);
     if (!toolResponse.ok) {
+        // clean-up any existing tools if the tool.gpt file is no longer found or is private
+        if (entry.tools && (toolResponse.status === 404 || toolResponse.status === 403)) {
+            await db.removeToolForUrl(url);
+        }
         throw createError({
             statusCode: toolResponse.status,
             statusMessage: await toolResponse.text()
