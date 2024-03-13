@@ -29,6 +29,6 @@ const searchTerm = ref('');
 const router = useRouter();
 
 const submitSearch = () => {
-  router.push('/' + searchTerm.value);
+  router.push('/search?q=' + searchTerm.value);
 };
 </script>

@@ -1,29 +1,49 @@
 <template>
     <div>
-        <h1>Search Results</h1>
-        <ul>
-            <li v-for="result in searchResults" :key="result.id">
-                {{ result.title }}
-            </li>
-        </ul>
+        <div v-if="!error.status" class="m-24 mt-36 prose">
+            <h1 class="text-3xl font-bold mb-8">Search Results</h1>
+            <div v-for="(tools, url) in searchResults" :key="url" class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">
+                    <a :href="`/${url}`" class="mb-2 block">
+                        {{ url }}
+                    </a>
+                </h2>
+                <div class="ml-8">
+                    <a :href="`/${url}#tool-${tool.name}`" v-for="tool in tools" :key="url + '-' + tool.name" class="mb-2 block">
+                        {{ tool.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <Error
+            class="flex flex-col items-center justify-center h-screen"
+            v-else
+            :title="`${error.status}`"
+            :message="error.message"
+        />
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            searchResults: [] // Placeholder for search results
-        };
-    },
-    mounted() {
-        // Call your search API here and update searchResults with the response
-        // Example:
-        // this.searchResults = await searchAPI.search(query);
-    }
-};
-</script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import type { Tool } from '@/lib/types';
 
-<style scoped>
-/* Add your custom styles here */
-</style>
+const searchResults = ref({} as Record<string, Tool[]>);
+const error = ref({status: 0, message: ''});
+
+const fetchData = async (q: string) => {
+    const results = await fetch(`/api/search?q=${q}`, { method: 'GET' });
+    if (!results.ok) {
+        error.value = { status: results.status, message: results.statusText };
+        return;
+    }
+    searchResults.value = await results.json() as Record<string, Tool[]>;
+};
+
+onMounted(async () => fetchData(useRoute().query.q as string));
+onBeforeRouteUpdate((to) => {
+    fetchData(to.query.q as string);
+});
+
+</script>
