@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     const toolResponse = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${toolPath}`);
     if (!toolResponse.ok) {
         // clean-up any existing tools if the tool.gpt file is no longer found or is private
-        if (entry.tools && (toolResponse.status === 404 || toolResponse.status === 403)) {
+        if (toolResponse.status === 404 || toolResponse.status === 403) {
             await db.removeToolForUrl(url);
         }
         throw createError({
