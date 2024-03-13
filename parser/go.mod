@@ -1,4 +1,4 @@
-module github.com/gptscript-ai/pkg-gptscript/parser
+module github.com/gptscript-ai/tools/parser
 
 go 1.22.0
 

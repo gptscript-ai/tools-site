@@ -1,5 +1,5 @@
 {
-  "name": "pkg-gptscript",
+  "name": "tools",
   "private": true,
   "type": "module",
   "scripts": {

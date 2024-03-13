@@ -9,7 +9,7 @@ To get started locally, follow these steps:
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/gptscript-ai/pkg-gptscript.git
+git clone https://github.com/gptscript-ai/tools.git
 ```
 
 2. Create a .env file in the root of your project and add your GitHub token:
