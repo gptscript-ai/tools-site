@@ -5,6 +5,7 @@ import { Octokit } from '@octokit/core';
 export default defineEventHandler(async (event) => {
     // grab the github URL from the path and check that it is valid
     const url = event.path.replace(/^\/api\//, "").split("?")[0];
+    console.log(url);
     if (!/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(url)) {
         throw createError({
             statusCode: 400,
