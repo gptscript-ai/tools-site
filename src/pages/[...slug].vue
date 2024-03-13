@@ -41,7 +41,7 @@
                         Internal Tools
                     </summary>
                     
-                    <div v-for="internalTool in internalTools" :key="internalTool.name" class="mb-10">
+                    <div v-for="internalTool in internalTools" :key="internalTool.name" class="mb-10 border-b border-gray-200">
                         <h2 :id="'tool-' + internalTool.name" class="text-xl font-semibold">{{ internalTool.name }}</h2>
                         <p class="text-gray-600">{{ internalTool.description }}</p>
                         <div>
