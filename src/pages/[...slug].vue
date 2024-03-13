@@ -1,23 +1,19 @@
 <template>
   <div>
       <div v-if="!error.status" class="flex">
-          <div class="hidden md:block border-r border-gray-200">
-              <Sidebar :headers="tools.map(tool => tool.name)" class="mt-28 sticky top-28 px-20"/>
-          </div>
-
           <div class="prose my-28 mx-auto px-20 md:max-w-screen-md lg:max-w-screen-lg">
               <header class="mb-10">
                   <h1 class="mb-0">{{ path }}</h1>
                   <a :href="`https://${githubURL}`" target="_blank" class="text-blue-500 underline">{{ githubURL }}</a>
               </header>
 
-              <div v-for="tool in tools" :key="tool.id" class="border border-gray-200 p-4 mb-10 rounded-lg">
-                  <h2 :id="'tool-' + tool.name" class="text-xl font-semibold">{{ tool.name }}</h2>
+              <h2>Overview</h2>
+              <div v-for="tool in entry.tools" :key="tool.id" class="mb-10">
                   <p class="text-gray-600">{{ tool.description }}</p>
 
                   <div>
                       <h3 :id="tool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                      <pre class="mt-2">tools: {{ tool.name ? `${tool.name} from ` : "" }}{{ githubURL }}</pre>  
+                      <pre class="mt-2">tools: {{ githubURL }}</pre>  
                   </div>
 
                   <div v-if="tool.arguments?.properties">
@@ -37,6 +33,14 @@
                       <p v-for="(usedTool) in tool.tools" :key="usedTool" class="text-gray-600">{{ usedTool }}</p>
                   </div>
               </div>
+
+              <h2 v-if="entry.examples && entry.examples.length">Examples</h2>
+              <div v-for="example in entry.examples" :key="example.name" class="mb-10">
+                  <h2 :id="'tool-' + example.name" class="text-xl font-semibold">{{ example.name }}</h2>
+                  <a :href="example.url" target="_blank" class="text-blue-500 underline">{{ example.url }}</a>
+                  <pre>{{ example.content }}</pre>
+              </div>
+
           </div>
       </div>
       
@@ -45,30 +49,30 @@
 </template>
 
 <script setup lang="ts">
-import type { Tool } from '@/lib/types';
+import type { Tool, ToolExample } from '@/lib/types';
 import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
 
 const owner = ref("");
 const path = ref("");
-const tools = ref([] as Tool[])
+const entry = ref({} as { tools: Tool[], examples: ToolExample[] })
 const error = ref({status: 0, message: ''});
 const githubURL = ref("");
 
 onMounted(async () => {
-  githubURL.value = route.path.replace(/^\//, "");
-  [owner.value, path.value] = githubURL.value.split("/").slice(-2);
+    githubURL.value = route.path.replace(/^\//, "");
+    [owner.value, path.value] = githubURL.value.split("/").slice(-2);
 
-  document.title = `${owner.value}/${path.value}`;
-  const toolAPIResponse = await fetch(`/api/${githubURL.value}`, { method: 'POST' });
-  if (!toolAPIResponse.ok) {
-      error.value = { status: toolAPIResponse.status, message: toolAPIResponse.statusText };
-      return;
-  }
+    document.title = `${owner.value}/${path.value}`;
+    const toolAPIResponse = await fetch(`/api/${githubURL.value}`, { method: 'POST' });
+    if (!toolAPIResponse.ok) {
+        error.value = { status: toolAPIResponse.status, message: toolAPIResponse.statusText };
+        return;
+    }
 
-  const toolAPIResponseJSON = await toolAPIResponse.json();
-  tools.value = toolAPIResponseJSON as Tool[];
+    const toolAPIResponseJSON = await toolAPIResponse.json();
+    entry.value = toolAPIResponseJSON as { tools: Tool[], examples: ToolExample[] };
 });
 </script>

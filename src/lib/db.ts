@@ -1,37 +1,65 @@
-import type { Tool } from '@/lib/types';
+import type { Tool, ToolExample } from '@/lib/types';
 
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getToolsForUrl = async (url: string): Promise<Tool[]> => {
+export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
     const toolEntry = await prisma.toolEntry.findFirst({
         where: {
             url: url
+        },
+        include: {
+            examples: true
         }
     });
 
     if (!toolEntry) {
-        return [];
+        return { tools: [], examples: [] };
     }
 
-    return toolEntry?.content as Tool[];;
+    return {
+        tools: JSON.parse(toolEntry.content as string) as Tool[],
+        examples: toolEntry.examples.map((example) => ({
+            name: example.name,
+            url: example.url,
+            content: example.content as string || '' // Ensure content is always a string
+        }))
+    };
 }
 
-export const upsertToolForUrl = async (url: string, tools: Tool[]): Promise<Tool[]> => {
+export const upsertToolForUrl = async (url: string, tools: Tool[], examples: ToolExample[]): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
     const toolEntry = await prisma.toolEntry.upsert({
         where: {
             url: url
         },
         update: {
-            content: JSON.stringify(tools)
+            content: JSON.stringify(tools),
+            examples: {
+                deleteMany: {},
+                create: examples
+            }
         },
         create: {
             url: url,
-            content: JSON.stringify(tools)
+            content: JSON.stringify(tools),
+            examples: {
+                create: examples
+            }
+        },
+        include: {
+            examples: true
         }
     });
-    return toolEntry.content as Tool[];
+    
+    return {
+        tools: JSON.parse(toolEntry.content as string) as Tool[],
+        examples: toolEntry.examples.map((example) => ({
+            name: example.name,
+            url: example.url,
+            content: example.content as string || '' // Ensure content is always a string
+        }))
+    };
 }
 
 export const removeToolForUrl = async (url: string): Promise<Tool[]> => {

@@ -20,6 +20,18 @@ model ToolEntry {
   content       Json
   url           String         @unique
   SubToolEntry  SubToolEntry[]
+  examples      Example[]
+}
+
+model Example {
+  id            Int        @id @default(autoincrement())
+  createdAt     DateTime   @default(now())
+  lastIndexedAt DateTime   @updatedAt
+  name          String     @db.VarChar(255)
+  content       Json
+  url           String     @unique
+  ToolEntry     ToolEntry? @relation(fields: [toolEntryId], references: [id])
+  toolEntryId   Int?
 }
 
 model SubToolEntry {

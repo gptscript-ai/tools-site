@@ -3,16 +3,11 @@
         <div v-if="!error.status" class="m-24 mt-36 prose">
             <h1 class="text-3xl font-bold mb-8">Search Results</h1>
             <div v-for="(tools, url) in searchResults" :key="url" class="mb-8">
-                <h2 class="text-xl font-semibold mb-4">
-                    <a :href="`/${url}`" class="mb-2 block">
-                        {{ url }}
-                    </a>
-                </h2>
-                <div class="ml-8">
-                    <a :href="`/${url}#tool-${tool.name}`" v-for="tool in tools" :key="url + '-' + tool.name" class="mb-2 block">
-                        {{ tool.name }}
-                    </a>
-                </div>
+                <a class="text-xl font-semibold mb-4 block" :href="`/${url}`">
+                    {{ url }}
+                </a>
+                <p :v-if="tools.length > 1 && tools[0].description"> {{ tools[0].description }} </p>
+                
             </div>
         </div>
         <Error

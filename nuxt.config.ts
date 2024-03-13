@@ -12,5 +12,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     databaseUrl: '', // NUXT_DATABASE_URL
     parserUrl: '', // NUXT_PARSER_URL
+    githubToken: '', // NUXT_GITHUB_TOKEN
   },
 })

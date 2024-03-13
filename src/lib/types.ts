@@ -1,3 +1,9 @@
+export interface ToolExample {
+    name: string;
+    url: string;
+    content: string;
+}
+
 export interface Tool {
     name?: string;
     description?: string;
