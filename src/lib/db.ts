@@ -62,13 +62,21 @@ export const upsertToolForUrl = async (url: string, tools: Tool[], examples: Too
     };
 }
 
-export const removeToolForUrl = async (url: string): Promise<Tool[]> => {
-    const toolEntry = await prisma.toolEntry.delete({
+export const removeToolForUrlIfExists = async (url: string): Promise<Tool[]> => {
+    const toolEntry = await prisma.toolEntry.findFirst({
         where: {
             url: url
         }
     });
-    return toolEntry.content as Tool[];
+    if (!toolEntry) {
+        return [];
+    }
+    await prisma.toolEntry.delete({
+        where: {
+            url: url
+        }
+    });
+    return JSON.parse(toolEntry.content as string) as Tool[];
 }
 
 export const getToolsForQuery = async (query: string): Promise<Record<string, Tool[]>> => {

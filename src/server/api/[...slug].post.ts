@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     if (!toolResponse.ok) {
         // clean-up any existing tools if the tool.gpt file is no longer found or is private
         if (toolResponse.status === 404 || toolResponse.status === 403) {
-            await db.removeToolForUrl(url);
+            await db.removeToolForUrlIfExists(url);
         }
         throw createError({
             statusCode: toolResponse.status,
