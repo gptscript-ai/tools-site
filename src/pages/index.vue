@@ -27,6 +27,6 @@ onMounted(() => {
     isInvalid.value = true;
     errorMessage.value = 'Not a valid repo';
   }
-  document.title = 'pkg.gptscript.ai';
+  document.title = 'tools.gptscript.ai';
 });
 </script>

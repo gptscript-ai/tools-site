@@ -1,4 +1,4 @@
-# pkg-gptscript
+# tools-gptscript-ai
 
 This project is a Nuxt 3 application for serving documentation for various tools in the gptscript ecosystem.
 

@@ -14,7 +14,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - NUXT_PARSER_URL=http://parser:8080
-      - NUXT_DB_URL=postgres://postgres:postgres@db:5432/pkg-gptscript
+      - NUXT_DB_URL=postgres://postgres:postgres@db:5432/tools-gptscript-ai
   db:
     image: postgres:16.2
     ports:
