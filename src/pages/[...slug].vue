@@ -1,7 +1,7 @@
 <template>
     <div> 
-        <div v-if="!error.status && !loading" class="flex">
-            <div class="prose my-28 mx-auto px-20 w-max">
+        <div v-if="!error.status && !loading">
+            <div class="prose my-28 mx-auto px-20 w-full md:w-3/4 lg:w-1/2 max-w-full">
                 <header class="mb-10">
                     <h1 class="mb-0">{{ header }}</h1>
                     <a :v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-blue-500 underline">{{ reference }}</a>
