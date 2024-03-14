@@ -1,10 +1,10 @@
 <template>
     <div> 
         <div v-if="!error.status && !loading" class="flex">
-            <div class="prose my-28 mx-auto px-20 w-full">
+            <div class="prose my-28 mx-auto px-20 w-max">
                 <header class="mb-10">
-                    <h1 class="mb-0">{{ repo }}</h1>
-                    <a :href="`https://${githubURL}`" target="_blank" class="text-blue-500 underline">{{ githubURL }}</a>
+                    <h1 class="mb-0">{{ header }}</h1>
+                    <a :v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-blue-500 underline">{{ reference }}</a>
                 </header>
 
                 <h2>Overview</h2>
@@ -13,7 +13,7 @@
 
                     <div>
                         <h3 :id="tool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                        <pre class="mt-2">tools: {{ githubURL }}</pre>  
+                        <pre class="mt-2">tools: {{ reference }}</pre>  
                     </div>
 
                     <div v-if="tool.arguments?.properties">
@@ -46,7 +46,7 @@
                         <p class="text-gray-600">{{ internalTool.description }}</p>
                         <div>
                             <h3 :id="internalTool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                            <pre class="mt-2">tools: {{ internalTool.name }} from {{ githubURL }}</pre>
+                            <pre class="mt-2">tools: {{ internalTool.name }} from {{ reference }}</pre>
                         </div>
                         <div v-if="internalTool.arguments?.properties">
                             <h3 :id="internalTool+ '-arguments'" class="mt-4 text-lg font-semibold">Arguments</h3>
@@ -82,34 +82,42 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const owner = ref("");
-const repo = ref("");
+const header = ref("");
 const tool = ref({} as Tool);
 const internalTools = ref([] as Tool[]);
 const examples = ref([] as ToolExample[]);
 const error = ref({status: 0, message: ''});
-const githubURL = ref("");
+const reference = ref("");
 const loading = ref(true);
+const isSysTool = ref(false);
 
 onMounted(async () => {
-    githubURL.value = route.path.replace(/^\//, "");
+    console.log(1)
+    reference.value = route.path.replace(/^\//, "");
 
     // if this tool does not start with sys., then it needs to be converted to a github URL
-    const isSysTool = githubURL.value.startsWith("sys.");
-    let path = githubURL.value
-    if (!isSysTool) {
-        githubURL.value = githubURL.value.replace("sys.", "github.com/gptscript-ai/");
+    isSysTool.value = reference.value.startsWith("sys.");
+    header.value = reference.value
+
+    let owner = ""
+    let repo = ""
+    let path = reference.value;
+    if (!isSysTool.value) {
+        // header is the value after the last slash
+        header.value = reference.value.split("/").pop() as string;
 
         // only split the first 3 slashes
-        [owner.value, repo.value] = githubURL.value.split("/").slice(1, 3);
-        const subpath = githubURL.value.split("/").slice(3).join("/");
+        [owner, repo] = reference.value.split("/").slice(1, 3);
+        const subpath = reference.value.split("/").slice(3).join("/");
+        console.log(subpath)
 
         // owner is before the first slash, repo is before the second slash and anything after that is the subpath
-        githubURL.value = subpath ? `github.com/${owner.value}/${repo.value}/blob/main/${subpath}` : `${githubURL.value}`;
-        path = `github.com/${owner.value}/${repo.value}${subpath ? '/'+subpath : ''}`;
+        reference.value = subpath ? `github.com/${owner}/${repo}/blob/main/${subpath}` : `${reference.value}`;
+        path = `github.com/${owner}/${repo}${subpath ? '/'+subpath : ''}`;
     }
 
-    console.log("before")
+    console.log(path)
+
     const toolAPIResponse = await fetch("/api/" + path, { method: 'POST' });
     if (!toolAPIResponse.ok) {
         document.title = `${toolAPIResponse.status}`;
@@ -118,9 +126,7 @@ onMounted(async () => {
         return;
     }
 
-    console.log("foo")
-
-    document.title = !isSysTool ? `${owner.value}/${repo.value}`: githubURL.value;
+    document.title = !isSysTool ? `${owner}/${repo}`: reference.value;
 
     const e = await toolAPIResponse.json() as { tools: Tool[], examples: ToolExample[] };
     
