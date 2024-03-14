@@ -13,11 +13,11 @@
 
                     <div>
                         <h3 :id="tool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                        <pre class="mt-2">tools: {{ reference }}</pre>
+                        <Code :text="`tools: ${path}`" />
                     </div>
 
-                    <div v-if="tool.arguments?.properties">
-                        <h3 :id="tool+ '-arguments'" class="mt-4 text-lg font-semibold">Arguments</h3>
+                    <details v-if="tool.arguments?.properties">
+                        <summary class="cursor-pointer mt-4 text-lg font-semibold">Arguments</summary>
                         <table class="mt-2">
                             <tbody>
                                 <tr v-for="(properties, arg) in tool.arguments?.properties" :key="arg">
@@ -26,30 +26,28 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    </details>
                 </div>
 
                 <h2 v-if="examples && examples.length">Examples</h2>
                 <div v-for="example in examples" :key="example.name" class="mb-10">
                     <h2 :id="'tool-' + example.name" class="text-xl font-semibold">{{ example.name }}</h2>
                     <a :href="example.url" target="_blank" class="text-blue-500 underline">{{ example.url }}</a>
-                    <pre>{{ example.content }}</pre>
+                    <Code :text="example.content" />
                 </div>
 
                 <details v-if="internalTools && internalTools.length">
-                    <summary class="text-2xl font-semibold">
-                        Internal Tools
-                    </summary>
+                    <summary class="cursor-pointer text-2xl font-semibold">Internal Tools</summary>
                     
                     <div v-for="internalTool in internalTools" :key="internalTool.name" class="mb-10 border-b border-gray-200">
                         <h2 :id="'tool-' + internalTool.name" class="text-xl font-semibold">{{ internalTool.name }}</h2>
                         <p class="text-gray-600">{{ internalTool.description }}</p>
                         <div>
                             <h3 :id="internalTool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                            <pre class="mt-2">tools: {{ internalTool.name }} from {{ reference }}</pre>
+                            <Code class="mt-2" :text="`tools: ${internalTool.name} from ${reference}`" />
                         </div>
-                        <div v-if="internalTool.arguments?.properties">
-                            <h3 :id="internalTool+ '-arguments'" class="mt-4 text-lg font-semibold">Arguments</h3>
+                        <details class="mb-10" v-if="internalTool.arguments?.properties">
+                            <summary :id="internalTool+ '-arguments'" class="cursor-pointer mt-4 text-lg font-semibold">Arguments</summary>
                             <table class="mt-2">
                                 <tbody>
                                     <tr v-for="(properties, arg) in internalTool.arguments?.properties" :key="arg">
@@ -58,7 +56,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </details>
                     </div>
                 </details>
             </div>
@@ -76,7 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import type { Tool, ToolExample } from '@/lib/types';
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -91,9 +88,9 @@ const error = ref({status: 0, message: ''});
 const reference = ref("");
 const loading = ref(true);
 const isSysTool = ref(false);
+const path = ref("");
 
 onMounted(async () => {
-    console.log(1)
     reference.value = route.path.replace(/^\//, "");
 
     // if this tool does not start with sys., then it needs to be converted to a github URL
@@ -102,7 +99,7 @@ onMounted(async () => {
 
     let owner = ""
     let repo = ""
-    let path = reference.value;
+    path.value = reference.value;
     if (!isSysTool.value) {
         // header is the value after the last slash
         header.value = reference.value.split("/").pop() as string;
@@ -114,12 +111,10 @@ onMounted(async () => {
 
         // owner is before the first slash, repo is before the second slash and anything after that is the subpath
         reference.value = subpath ? `github.com/${owner}/${repo}/blob/main/${subpath}` : `${reference.value}`;
-        path = `github.com/${owner}/${repo}${subpath ? '/'+subpath : ''}`;
+        path.value = `github.com/${owner}/${repo}${subpath ? '/'+subpath : ''}`;
     }
 
-    console.log(path)
-
-    const toolAPIResponse = await fetch("/api/" + path, { method: 'POST' });
+    const toolAPIResponse = await fetch("/api/" + path.value, { method: 'POST' });
     if (!toolAPIResponse.ok) {
         document.title = `${toolAPIResponse.status}`;
         error.value = { status: toolAPIResponse.status, message: toolAPIResponse.statusText };
@@ -130,7 +125,6 @@ onMounted(async () => {
     document.title = !isSysTool ? `${owner}/${repo}`: reference.value;
 
     const e = await toolAPIResponse.json() as { tools: Tool[], examples: ToolExample[] };
-    
     tool.value = e.tools[0];
     internalTools.value = e.tools.slice(1);
     examples.value = e.examples;
