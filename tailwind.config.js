@@ -9,7 +9,11 @@ module.exports = {
     "./src/error.vue",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "dark-gray": "#242526"
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),

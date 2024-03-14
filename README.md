@@ -1,9 +1,9 @@
 # tools
-[tools.gptscript.com](https://tools.gptscript.com)
 
 This project is a Nuxt 3 application for serving documentation for various tools in the gptscript ecosystem.
 
 ## Local development
+
 To get started locally, follow these steps:
 
 1. Clone this repository:
