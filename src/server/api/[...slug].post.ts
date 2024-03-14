@@ -90,31 +90,35 @@ export default defineEventHandler(async (event) => {
 // getExamples fetches the examples from the repo located at github.com/owner/repo and returns them as an array of ToolExample objects
 const getExamples = async (owner: string, repo: string): Promise<ToolExample[]> => {
     const octokit = new Octokit({ auth: useRuntimeConfig().githubToken});
-        
-    // Get the contents of the examples directory
-    const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-        owner,
-        repo,
-        path: 'examples',
-        ref: 'main' // Replace 'main' with the desired branch name
-    });
 
-    // Filter the response to include only .gpt files
-    const gptExamples = (response.data as any[]).filter((file: any) => file.type === 'file' && file.name.endsWith('.gpt'));
-
-    const gptFiles: ToolExample[] = await Promise.all(gptExamples.map(async (example: any) => {
+    try {
+        // Get the contents of the examples directory
         const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
             owner,
             repo,
-            path: example.path,
+            path: 'examples',
             ref: 'main' // Replace 'main' with the desired branch name
         });
 
-        const content = Buffer.from((response.data as any).content, 'base64').toString();
-        const githubLink = `https://github.com/${owner}/${repo}/blob/main/${example.path}`; 
+        // Filter the response to include only .gpt files
+        const gptExamples = (response.data as any[]).filter((file: any) => file.type === 'file' && file.name.endsWith('.gpt'));
 
-        return { name: example.name, url: githubLink, content };
-    }));
+        const gptFiles: ToolExample[] = await Promise.all(gptExamples.map(async (example: any) => {
+            const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+                owner,
+                repo,
+                path: example.path,
+                ref: 'main' // Replace 'main' with the desired branch name
+            });
 
-    return gptFiles;
+            const content = Buffer.from((response.data as any).content, 'base64').toString();
+            const githubLink = `https://github.com/${owner}/${repo}/blob/main/${example.path}`; 
+
+            return { name: example.name, url: githubLink, content };
+        }));
+
+        return gptFiles;
+    } catch (e) {
+        return [];
+    }
 };
