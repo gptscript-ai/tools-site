@@ -5,7 +5,22 @@ import { Octokit } from '@octokit/core';
 export default defineEventHandler(async (event) => {
     // grab the github URL from the path and check that it is valid
     const url = event.path.replace(/^\/api\//, "").split("?")[0];
-    console.log(url);
+
+    // if the url starts with sys. then it is a system tool and we should return the system tool. system tools
+    // are not fetched from github and are instead loaded directly into the database through the indexing
+    // cronjob defined in render.
+    if (url.startsWith("sys.")) {
+        const tool = await db.getSystemTool(url);
+        if (!tool.tools.length) {
+            throw createError({
+                statusCode: 404,
+                statusMessage: "Tool not found"
+            });
+        }
+        setResponseHeader(event, "Content-Type", "application/json");
+        return tool;
+    }
+
     if (!/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(url)) {
         throw createError({
             statusCode: 400,

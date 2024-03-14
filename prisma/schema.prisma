@@ -14,13 +14,13 @@ datasource db {
 }
 
 model ToolEntry {
-  id            Int            @id @default(autoincrement())
-  createdAt     DateTime       @default(now())
-  lastIndexedAt DateTime       @updatedAt
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  lastIndexedAt DateTime  @updatedAt
   content       Json
-  url           String         @unique
-  SubToolEntry  SubToolEntry[]
+  reference     String    @unique
   examples      Example[]
+  systemTool    Boolean   @default(false)
 }
 
 model Example {
@@ -32,15 +32,4 @@ model Example {
   url           String     @unique
   ToolEntry     ToolEntry? @relation(fields: [toolEntryId], references: [id])
   toolEntryId   Int?
-}
-
-model SubToolEntry {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  lastIndexedAt DateTime  @updatedAt
-  name          String    @db.VarChar(255)
-  content       Json
-  url           String    @unique
-  toolEntry     ToolEntry @relation(fields: [toolId], references: [id])
-  toolId        Int
 }

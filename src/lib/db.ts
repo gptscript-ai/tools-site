@@ -1,13 +1,13 @@
 import type { Tool, ToolExample } from '@/lib/types';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
     const toolEntry = await prisma.toolEntry.findFirst({
         where: {
-            url: url
+            reference: url
         },
         include: {
             examples: true
@@ -19,7 +19,32 @@ export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], exam
     }
 
     return {
-        tools: JSON.parse(toolEntry.content as string) as Tool[],
+        tools: toolEntry.content as Tool[],
+        examples: toolEntry.examples.map((example) => ({
+            name: example.name,
+            url: example.url,
+            content: example.content as string || '' // Ensure content is always a string
+        }))
+    };
+}
+
+export const getSystemTool = async (name: string): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
+    const toolEntry = await prisma.toolEntry.findFirst({
+        where: {
+            reference: name,
+            systemTool: true
+        },
+        include: {
+            examples: true
+        }
+    });
+
+    if (!toolEntry) {
+        return { tools: [], examples: [] };
+    }
+
+    return {
+        tools: toolEntry.content as Tool[],
         examples: toolEntry.examples.map((example) => ({
             name: example.name,
             url: example.url,
@@ -31,18 +56,18 @@ export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], exam
 export const upsertToolForUrl = async (url: string, tools: Tool[], examples: ToolExample[]): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
     const toolEntry = await prisma.toolEntry.upsert({
         where: {
-            url: url
+            reference: url
         },
         update: {
-            content: JSON.stringify(tools),
+            content: tools as Prisma.JsonArray,
             examples: {
                 deleteMany: {},
                 create: examples
             }
         },
         create: {
-            url: url,
-            content: JSON.stringify(tools),
+            reference: url,
+            content: tools as Prisma.JsonArray,
             examples: {
                 create: examples
             }
@@ -53,7 +78,7 @@ export const upsertToolForUrl = async (url: string, tools: Tool[], examples: Too
     });
     
     return {
-        tools: JSON.parse(toolEntry.content as string) as Tool[],
+        tools: toolEntry.content as Tool[],
         examples: toolEntry.examples.map((example) => ({
             name: example.name,
             url: example.url,
@@ -65,7 +90,7 @@ export const upsertToolForUrl = async (url: string, tools: Tool[], examples: Too
 export const removeToolForUrlIfExists = async (url: string): Promise<Tool[]> => {
     const toolEntry = await prisma.toolEntry.findFirst({
         where: {
-            url: url
+            reference: url
         }
     });
     if (!toolEntry) {
@@ -73,16 +98,16 @@ export const removeToolForUrlIfExists = async (url: string): Promise<Tool[]> => 
     }
     await prisma.toolEntry.delete({
         where: {
-            url: url
+            reference: url
         }
     });
-    return JSON.parse(toolEntry.content as string) as Tool[];
+    return toolEntry.content as Tool[];
 }
 
 export const getToolsForQuery = async (query: string): Promise<Record<string, Tool[]>> => {
     const toolEntries = await prisma.toolEntry.findMany({
         where: {
-            url: {
+            reference: {
                 contains: query
             }
         }
@@ -90,12 +115,12 @@ export const getToolsForQuery = async (query: string): Promise<Record<string, To
 
     const tools: Record<string, Tool[]> = {};
     for (const entry of toolEntries) {
-        const parsedTool = JSON.parse(entry.content as string) as Tool[];
+        const parsedTool = entry.content as Tool[];
         for (const tool of parsedTool) {
-            if (tools[entry.url]) {
-                tools[entry.url].push(tool);
+            if (tools[entry.reference]) {
+                tools[entry.reference].push(tool);
             } else {
-                tools[entry.url] = [tool];
+                tools[entry.reference] = [tool];
             }
         }
     }

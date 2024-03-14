@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gptscript-ai/gptscript/pkg/builtin"
 	"github.com/gptscript-ai/gptscript/pkg/parser"
 )
 
@@ -17,19 +18,24 @@ func main() {
 	router.Use(corsMiddleware())
 
 	// setup routes
-	router.POST("/", handleRequest)
+	router.POST("/", parse)
+	router.GET("/", listTools)
 
 	// start server
 	log.Fatal(router.Run(":8080"))
 }
 
-func handleRequest(c *gin.Context) {
+func parse(c *gin.Context) {
 	parsedScript, err := parser.Parse(c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error parsing script"})
 		return
 	}
 	c.JSON(http.StatusOK, parsedScript)
+}
+
+func listTools(c *gin.Context) {
+	c.JSON(http.StatusOK, builtin.ListTools())
 }
 
 func corsMiddleware() gin.HandlerFunc {

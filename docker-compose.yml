@@ -31,3 +31,11 @@ services:
       - "8080:8080"
     volumes:
       - ./parser:/app
+  indexer:
+    build:
+      context: ./indexer
+    depends_on:
+      - db
+    environment:
+      - DB_URL=postgres://postgres:postgres@db:5432/tools?sslmode=disable
+    restart: on-failure

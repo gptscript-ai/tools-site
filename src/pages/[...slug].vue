@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <div v-if="!error.status" class="flex">
-            <div class="prose my-28 mx-auto px-20 md:max-w-screen-md lg:max-w-screen-lg">
+    <div> 
+        <div v-if="!error.status && !loading" class="flex">
+            <div class="prose my-28 mx-auto px-20 w-full">
                 <header class="mb-10">
                     <h1 class="mb-0">{{ repo }}</h1>
                     <a :href="`https://${githubURL}`" target="_blank" class="text-blue-500 underline">{{ githubURL }}</a>
@@ -64,13 +64,20 @@
             </div>
         </div>
       
+        <div v-else-if="loading" class="flex items-center justify-center h-screen">
+            <div class="flex flex-col items-center justify-center h-screen">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-6 border-gray-900"></div>
+                <p class="mt-10 text-gray-900 text-xl font-semibold">Loading content...</p>
+            </div>
+        </div>
+      
         <Error class="flex flex-col items-center justify-center h-screen" v-else :title="`${error.status}`" :message="error.message"/>
     </div>
 </template>
 
 <script setup lang="ts">
 import type { Tool, ToolExample } from '@/lib/types';
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -82,30 +89,44 @@ const internalTools = ref([] as Tool[]);
 const examples = ref([] as ToolExample[]);
 const error = ref({status: 0, message: ''});
 const githubURL = ref("");
+const loading = ref(true);
 
 onMounted(async () => {
     githubURL.value = route.path.replace(/^\//, "");
 
-    // only split the first 3 slashes
-    [owner.value, repo.value] = githubURL.value.split("/").slice(1, 3);
-    const subpath = githubURL.value.split("/").slice(3).join("/");
+    // if this tool does not start with sys., then it needs to be converted to a github URL
+    const isSysTool = githubURL.value.startsWith("sys.");
+    let path = githubURL.value
+    if (!isSysTool) {
+        githubURL.value = githubURL.value.replace("sys.", "github.com/gptscript-ai/");
 
-    // owner is before the first slash, repo is before the second slash and anything after that is the subpath
-    githubURL.value = subpath ? `github.com/${owner.value}/${repo.value}/blob/main/${subpath}` : `${githubURL.value}`;
+        // only split the first 3 slashes
+        [owner.value, repo.value] = githubURL.value.split("/").slice(1, 3);
+        const subpath = githubURL.value.split("/").slice(3).join("/");
 
-    console.log(`/api/github.com/${owner.value}/${repo.value}/${subpath}`)
+        // owner is before the first slash, repo is before the second slash and anything after that is the subpath
+        githubURL.value = subpath ? `github.com/${owner.value}/${repo.value}/blob/main/${subpath}` : `${githubURL.value}`;
+        path = `github.com/${owner.value}/${repo.value}${subpath ? '/'+subpath : ''}`;
+    }
 
-    document.title = `${owner.value}/${repo.value}`;
-    const url = `/api/github.com/${owner.value}/${repo.value}${subpath ? '/'+subpath : ''}`;
-    const toolAPIResponse = await fetch(url, { method: 'POST' });
+    console.log("before")
+    const toolAPIResponse = await fetch("/api/" + path, { method: 'POST' });
     if (!toolAPIResponse.ok) {
+        document.title = `${toolAPIResponse.status}`;
         error.value = { status: toolAPIResponse.status, message: toolAPIResponse.statusText };
+        loading.value = false;
         return;
     }
 
+    console.log("foo")
+
+    document.title = !isSysTool ? `${owner.value}/${repo.value}`: githubURL.value;
+
     const e = await toolAPIResponse.json() as { tools: Tool[], examples: ToolExample[] };
+    
     tool.value = e.tools[0];
     internalTools.value = e.tools.slice(1);
     examples.value = e.examples;
+    loading.value = false;
 });
 </script>
