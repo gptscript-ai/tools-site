@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!error.status" class="m-24 mt-36 prose">
+        <div v-if="!error.status" class="m-10 md:m-24 mt-36 prose">
             <h1 class="text-3xl font-bold mb-8">Search Results</h1>
             <div v-for="(tools, url) in searchResults" :key="url" class="mb-8">
                 <a class="text-xl font-semibold mb-4 block" :href="`/${url}`">
