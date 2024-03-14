@@ -9,6 +9,7 @@
             <router-link to="/github.com/gptscript-ai/vision" class="tile rounded bg-gray-200 p-4 m-2 text-2xlg">Vision</router-link>
             <router-link to="/github.com/gptscript-ai/image-generation" class="tile rounded bg-gray-200 p-4 m-2 text-2xlg">Image Generation</router-link>
 			<router-link to="/github.com/gptscript-ai/browser" class="tile rounded bg-gray-200 p-4 m-2 text-2xlg">Browser</router-link>
+            <router-link to="/search?q=sys." class="tile rounded bg-gray-200 p-4 m-2 text-2xlg">System Tools</router-link>
         </div>
   </div>
 </template>

@@ -13,7 +13,7 @@
 
                     <div>
                         <h3 :id="tool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
-                        <pre class="mt-2">tools: {{ reference }}</pre>  
+                        <pre class="mt-2">tools: {{ reference }}</pre>
                     </div>
 
                     <div v-if="tool.arguments?.properties">
@@ -76,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import type { Tool, ToolExample } from '@/lib/types';
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
