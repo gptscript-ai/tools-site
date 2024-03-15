@@ -40,7 +40,6 @@ export default defineEventHandler(async (event) => {
     
     // construct the path to the tool.gpt file
     const toolPath = subdirs.length > 0 ? `${subdirs.join("/")}/tool.gpt` : "tool.gpt";
-    console.log(`https://raw.githubusercontent.com/${owner}/${repo}/main/${toolPath}`)
 
     // fetch the tool.gpt file from github
     const toolResponse = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${toolPath}`);

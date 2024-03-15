@@ -107,7 +107,6 @@ onMounted(async () => {
         // only split the first 3 slashes
         [owner, repo] = reference.value.split("/").slice(1, 3);
         const subpath = reference.value.split("/").slice(3).join("/");
-        console.log(subpath)
 
         // owner is before the first slash, repo is before the second slash and anything after that is the subpath
         reference.value = subpath ? `github.com/${owner}/${repo}/blob/main/${subpath}` : `${reference.value}`;
