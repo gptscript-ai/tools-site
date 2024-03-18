@@ -15,7 +15,7 @@
             <router-link to="/github.com/gptscript-ai/vision" class="rounded bg-gray-200 p-4 m-2 text-2xl hover:bg-green-300">Vision</router-link>
             <router-link to="/github.com/gptscript-ai/image-generation" class="rounded bg-gray-200 p-4 m-2 text-2xl hover:bg-green-300">Image Generation</router-link>
             <router-link to="/github.com/gptscript-ai/browser" class="rounded bg-gray-200 p-4 m-2 text-2xl hover:bg-green-300">Browser</router-link>
-            <router-link to="/search?q=sys." class="rounded bg-gray-200 p-4 m-2 text-2xl hover:bg-green-500">System Tools</router-link>
+            <router-link to="/search?q=sys." class="rounded bg-gray-200 p-4 m-2 text-2xl hover:bg-green-300">System Tools</router-link>
         </div>
     </div>
 </template>
