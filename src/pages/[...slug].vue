@@ -32,7 +32,7 @@
                 <h2 v-if="examples && examples.length">Examples</h2>
                 <div v-for="example in examples" :key="example.name" class="mb-10">
                     <h2 :id="'tool-' + example.name" class="text-xl font-semibold">{{ example.name }}</h2>
-                    <a :href="example.url" target="_blank" class="text-blue-500 underline">{{ example.url }}</a>
+                    <a :href="example.url" target="_blank" class="text-green-400 underline">{{ example.url }}</a>
                     <Code :text="example.content" />
                 </div>
 
