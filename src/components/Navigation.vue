@@ -16,6 +16,7 @@
                 <li class="grow w-64 md:w-96">
                     <Search :placeholder="placeHolder" />
                 </li>
+                <router-link to="/search?q=." class="text-white hover:text-green-300">All Tools</router-link>
                 <li class="hidden md:block"><a :href="githubLink" class="text-white hover:text-green-300">GitHub</a></li>
                 <li class="hidden md:block"><a :href="docsLink" class="text-white hover:text-green-300 mr-5">Docs</a></li>
             </ul>
