@@ -4,7 +4,7 @@
             <div class="prose my-28 mx-auto px-5 md:px-20 w-full md:w-3/4 lg:w-1/2 max-w-full">
                 <header class="mb-10">
                     <h1 class="mb-0">{{ header }}</h1>
-                    <a v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-green-500 underline">{{ reference }}</a>
+                    <a v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-green-400 underline">{{ reference }}</a>
                 </header>
 
                 <h2>Overview</h2>
