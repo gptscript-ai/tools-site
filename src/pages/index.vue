@@ -27,7 +27,7 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const isInvalid = ref(false);
 const errorMessage = ref('');
-const placeHolder = ref('Search for a tool to get started...');
+const placeHolder = ref('Search for a tool or enter a tool\'s github URL to index it...');
 
 onMounted(() => {
   if (route.query.isInvalid === 'true') {
