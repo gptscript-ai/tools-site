@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -15,6 +16,8 @@ import (
 )
 
 func main() {
+	log.Infof("Starting the indexer at %s", time.Now())
+
 	dbConnectionString := os.Getenv("DB_URL")
 	if dbConnectionString == "" {
 		log.Fatal("DB_URL environment variable is not set")
