@@ -38,4 +38,5 @@ services:
       - db
     environment:
       - DB_URL=postgres://postgres:postgres@db:5432/tools?sslmode=disable
+      - API_URL=http://app:3000/api
     restart: on-failure
