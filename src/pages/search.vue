@@ -21,13 +21,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import type { Tool } from '@/lib/types';
 
+const router = useRouter();
 const searchResults = ref({} as Record<string, Tool[]>);
 const error = ref({status: 0, message: ''});
 
 const fetchData = async (q: string) => {
+    // if the query is a github valid github url, we want to redirect to that tool's page
+    if (/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(q)) {
+        q = q.replace(/^https?:\/\//, '');
+        router.push(`/${q}`);
+        return;
+    }
+
     const results = await fetch(`/api/search?q=${q}`, { method: 'GET' });
     if (!results.ok) {
         error.value = { status: results.status, message: results.statusText };
