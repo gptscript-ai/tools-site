@@ -4,7 +4,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], examples: ToolExample[] }> => {
+export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], examples: ToolExample[], lastIndexedAt: Date }> => {
     const toolEntry = await prisma.toolEntry.findFirst({
         where: {
             reference: url
@@ -15,11 +15,12 @@ export const getToolsForUrl = async (url: string): Promise<{ tools: Tool[], exam
     });
 
     if (!toolEntry) {
-        return { tools: [], examples: [] };
+        return { tools: [], examples: [], lastIndexedAt: new Date() };
     }
 
     return {
         tools: toolEntry.content as Tool[],
+        lastIndexedAt: toolEntry.lastIndexedAt,
         examples: toolEntry.examples.map((example) => ({
             name: example.name,
             url: example.url,

@@ -30,10 +30,17 @@ export default defineEventHandler(async (event) => {
     
     // if the tool is already indexed and force is not true, return the tool
     let entry = await db.getToolsForUrl(url);
-    if (entry.tools.length > 0 && !getQuery(event).force) {
+
+    // if the tool is already indexed and the last index time is less than 1 hour ago, return the tool
+    if (entry.tools.length > 0 && entry.lastIndexedAt && (Date.now() - Number(entry.lastIndexedAt)) < 3600000) {
+        // add headers to communicate that the response is cached and when it was last indexed
         setResponseHeader(event, "Content-Type", "application/json");
+        setResponseHeader(event, "Cached-Response", "true")
+        setResponseHeader(event, "Last-Indexed-At", entry.lastIndexedAt.toISOString())
+        setResponseStatus(event, 200)
         return entry;
     }
+    setResponseHeader(event, "Cached-Response", "false")
 
     // grab the owner, repo and subdirs from the URL if they exist
     const [owner, repo, ...subdirs] = url.replace(/^(https?:\/\/)?(www\.)?github\.com\//, "").split("/");
@@ -80,6 +87,7 @@ export default defineEventHandler(async (event) => {
 
     // upsert the tool into the database and return the tool
     setResponseHeader(event, "Content-Type", "application/json");
+    setResponseStatus(event, 201)
     return await db.upsertToolForUrl(url, 
         parsedTools, 
         await getExamples(owner, repo)
