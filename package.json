@@ -12,7 +12,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "start": "nuxt start",
-    "start:migrate": "npx prisma migrate deploy && yarn start"
+    "start:migrate": "npx prisma migrate deploy && yarn start",
+    "go:tidy": "(cd indexer && go mod tidy) && (cd parser && go mod tidy)",
+    "go:build": "(cd indexer && go build) && (cd parser && go build)"
   },
   "dependencies": {
     "@octokit/core": "^6.0.1",
