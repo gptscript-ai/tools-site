@@ -25,12 +25,13 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@nuxt/ui": "^2.14.2",
     "@tailwindcss/typography": "^0.5.10",
     "@types/markdown-it": "^13.0.7",
     "@types/pg": "^8.11.2",
     "autoprefixer": "^10.4.18",
-    "nuxt-icon": "^0.6.9",
     "postcss": "^8.4.35",
+    "postcss-custom-properties": "^13.3.6",
     "prisma": "^5.11.0",
     "tailwindcss": "^3.4.1"
   }
