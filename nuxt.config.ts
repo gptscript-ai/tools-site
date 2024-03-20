@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   srcDir: 'src',
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  css: ['@/assets/css/main.css'],
   modules: [
     '@nuxt/ui',
     '@nuxtjs/tailwindcss'
