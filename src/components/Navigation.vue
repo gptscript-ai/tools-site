@@ -6,19 +6,23 @@
                     <nuxt-link to="/" class="">
                         <img src="@/assets/img/logo.svg" alt="Logo" class="h-10 w-10 mr-2">
                     </nuxt-link>
-
-                    <nuxt-link to="/" class="text-white hover:text-green-300 hidden md:block">GPTScript</nuxt-link>
+                    <nuxt-link to="/" class="text-white hover:text-green-300 hidden sm:block">GPTScript</nuxt-link>
                 </li>
             </ul>
         </div>
         <div class="flex items-center h-full">
-            <ul class="flex space-x-6 items-center">
-                <li class="grow w-64 md:w-96">
-                    <Search :placeholder="placeHolder" />
-                </li>
-                <li class="hidden md:block"><router-link to="/search?q=." class="text-white hover:text-green-300">All Tools</router-link></li>
-                <li class="hidden md:block"><a :href="githubLink" class="text-white hover:text-green-300">GitHub</a></li>
-                <li class="hidden md:block"><a :href="docsLink" class="text-white hover:text-green-300 mr-5">Docs</a></li>
+            <ul class="flex md:space-x-6 items-center">
+                <li><Search :placeholder="placeHolder" /></li>
+                <li class="hidden md:block"><router-link to="/search?q=." class="text-white hover:text-green-300">
+                    All Tools <UIcon name="i-heroicons-arrow-top-right-on-square"/>
+                </router-link></li>
+                <li class="hidden md:block"><a :href="githubLink" class="text-white hover:text-green-300">
+                    GitHub <UIcon name="i-heroicons-arrow-top-right-on-square"/>
+                </a></li>
+                <li class="hidden md:block"><a :href="docsLink" class="text-white hover:text-green-300">
+                    Docs <UIcon name="i-heroicons-arrow-top-right-on-square"/>
+                </a></li>
+                <li><DisplayMode/></li>
             </ul>
         </div>
     </nav>

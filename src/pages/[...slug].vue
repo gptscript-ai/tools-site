@@ -1,15 +1,20 @@
 <template>
     <div> 
         <div v-if="!error.status && !loading">
-            <div class="prose my-28 mx-auto px-5 md:px-20 w-full md:w-3/4 lg:w-1/2 max-w-full">
+            <div class="prose dark:prose-invert my-28 mx-auto px-5 md:px-20 w-full md:w-3/4 lg:w-1/2 max-w-full">
                 <header class="mb-10">
-                    <h1 class="mb-0">{{ header }}</h1>
-                    <a v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-green-400 underline">{{ reference }}</a>
+                    <div>
+                        <h1 class="mb-0 inline">{{ header }}</h1>
+                        <UTooltip v-if="!isSysTool" text="Re-index tool" :popper="{ placement: 'right' }">
+                            <UButton variant="ghost" color="black" class="ml-2 inline" size="2xs" icon="i-heroicons-arrow-path" @click="fetchData(true)" />
+                        </UTooltip>
+                    </div>
+                    <a v-if="!isSysTool" :href="`https://${reference}`" target="_blank" class="text-green-400 underline block">{{ reference }}</a>
+                    
                 </header>
 
-                <h2>Overview</h2>
                 <div :key="tool.name" class="mb-10">
-                    <p class="text-gray-600">{{ tool.description }}</p>
+                    <p>{{ tool.description }}</p>
 
                     <div>
                         <h3 :id="tool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
@@ -41,7 +46,7 @@
                     
                     <div v-for="internalTool in internalTools" :key="internalTool.name" class="mb-10 border-b border-gray-200">
                         <h2 :id="'tool-' + internalTool.name" class="text-xl font-semibold">{{ internalTool.name }}</h2>
-                        <p class="text-gray-600">{{ internalTool.description }}</p>
+                        <p>{{ internalTool.description }}</p>
                         <div>
                             <h3 :id="internalTool.name + '-usage'" class="mt-4 text-lg font-semibold">Usage</h3>
                             <Code class="mt-2" :text="`tools: ${internalTool.name} from ${reference}`" />
@@ -64,8 +69,8 @@
       
         <div v-else-if="loading" class="flex items-center justify-center h-screen">
             <div class="flex flex-col items-center justify-center h-screen">
-                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-6 border-gray-900"></div>
-                <p class="mt-10 text-gray-900 text-xl font-semibold">Loading content...</p>
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-6"></div>
+                <p class="mt-10 text-xl font-semibold">Loading content...</p>
             </div>
         </div>
       
@@ -79,6 +84,7 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
+const toast = useToast()
 
 const header = ref("");
 const tool = ref({} as Tool);
@@ -90,7 +96,10 @@ const loading = ref(true);
 const isSysTool = ref(false);
 const path = ref("");
 
-onMounted(async () => {
+onMounted(() => fetchData(false));
+
+const fetchData = async (force: boolean) => {
+    loading.value = true;
     reference.value = route.path.replace(/^\//, "");
 
     // if this tool does not start with sys., then it needs to be converted to a github URL
@@ -113,7 +122,7 @@ onMounted(async () => {
         path.value = `github.com/${owner}/${repo}${subpath ? '/'+subpath : ''}`;
     }
 
-    const toolAPIResponse = await fetch("/api/" + path.value, { method: 'POST' });
+    const toolAPIResponse = await fetch("/api/" + path.value + `${force ? "?force=true" : ""}`, { method: 'POST' });
     if (!toolAPIResponse.ok) {
         document.title = `${toolAPIResponse.status}`;
         error.value = { status: toolAPIResponse.status, message: toolAPIResponse.statusText };
@@ -128,5 +137,26 @@ onMounted(async () => {
     internalTools.value = e.tools.slice(1);
     examples.value = e.examples;
     loading.value = false;
-});
+
+    if (force) {
+        if (toolAPIResponse.status === 201) {
+            toast.add({
+                title: 'Tool re-indexed',
+                description: 'Tool content has been re-indexed! You can re-index again in an hour.',
+                icon: 'i-heroicons-check-circle',
+                timeout: 5000,
+            })
+        } else if (toolAPIResponse.status === 200) {
+            const lastIndexedAt = new Date(String(toolAPIResponse.headers.get('Last-Indexed-At')));
+            const friendlyTime = lastIndexedAt.toLocaleString();
+            toast.add({
+                title: 'Content refreshed',
+                description: 'Tools can only be re-indexed every hour and the last index occurred at ' + friendlyTime,
+                icon: 'i-heroicons-arrow-path',
+                timeout: 7000,
+            })
+        }
+    }
+}
+
 </script>
