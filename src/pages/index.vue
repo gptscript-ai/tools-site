@@ -10,12 +10,12 @@ const featured: Tool[] = [
   { name: 'Vision', icon: 'i-heroicons-camera', link: '/github.com/gptscript-ai/vision' },
   { name: 'Image Generation', icon: 'i-heroicons-paint-brush', link: '/github.com/gptscript-ai/image-generation' },
   { name: 'Browser', icon: 'i-heroicons-tv', link: '/github.com/gptscript-ai/browser' },
-  { name: 'System Tools', icon: 'i-heroicons-wrench', link: '/search?q=.' },
+  { name: 'System Tools', icon: 'i-heroicons-wrench', link: '/search?q=sys.' },
 ]
 </script>
 
 <template>
-  <div class="min-h-full text-center justify-start md:justify-center items-center p-10 flex flex-col">
+  <div class="h-[90vh] text-center justify-start md:justify-center items-center p-10 flex flex-col">
     <h2 class="text-4xl md:text-5xl mb-4 mx-2">
       Welcome to tools.gptscript.ai
     </h2>
@@ -25,7 +25,9 @@ const featured: Tool[] = [
       There's probably a tool for it.
     </h3>
 
-    <Search class="inline-block w-[100%] md:w-[50vw] mb-1" size="xl" placeholder="Search for a tool or enter a GitHub URL to index one…" />
+    <div class="w-screen">
+      <Search class="inline-block w-[90%] xl:w-[50vw] mb-1" size="xl" placeholder="Search for a tool or enter a GitHub URL to index one…" />
+    </div>
 
     <UDivider class="md:hidden my-10" :ui="{ label: 'text-gray-500 text-lg font-normal' }" />
 

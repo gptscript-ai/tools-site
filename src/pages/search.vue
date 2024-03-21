@@ -53,6 +53,9 @@ onMounted(() => fetchData())
       <template v-if="q === '.'">
         All Tools
       </template>
+      <template v-else-if="q === ('sys.')">
+        System Tools
+      </template>
       <template v-else>
         Search Results: {{ q }}
       </template>

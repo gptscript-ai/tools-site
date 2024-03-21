@@ -19,23 +19,21 @@ export default defineEventHandler(async (event) => {
       })
     }
     setResponseHeader(event, 'Content-Type', 'application/json')
-
     return tool
   }
 
   if (!/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(url)) {
     throw createError({
-      statusCode:    400,
-      statusMessage: 'Invalid URL',
-    })
+      statusCode: 400,
+      statusMessage: "Invalid URL"
+    });
   }
 
   // if the tool is already indexed and force is not true, return the tool
   const entry = await db.getToolsForUrl(url)
 
   // if the tool is already indexed or if force is not set and the last index time is less than 1 hour ago, return the tool
-  const forceSetAndReady = getQuery(event).force && entry.lastIndexedAt && (Date.now() - Number(entry.lastIndexedAt)) < 3600000
-
+  const forceSetAndReady = getQuery(event).force && entry.lastIndexedAt && (Date.now() - Number(entry.lastIndexedAt)) > 3600000
   if (entry.tools.length > 0 && !forceSetAndReady) {
     // add headers to communicate that the response is cached and when it was last indexed
     setResponseHeader(event, 'Content-Type', 'application/json')
@@ -96,7 +94,7 @@ export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Content-Type', 'application/json')
   setResponseStatus(event, 201)
 
-  return await db.upsertToolForUrl(url,         parsedTools,         await getExamples(owner, repo),
+  return await db.upsertToolForUrl(url, parsedTools, await getExamples(owner, repo),
   )
 })
 
