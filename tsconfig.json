@@ -5,8 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@app": ["src/App.vue"]
     }
   },
-  "tabWidth": 4,
+  "tabWidth": 2,
 }

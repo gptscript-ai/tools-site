@@ -1,62 +1,78 @@
-<template>
-    <div>
-        <div v-if="!error.status && !loading" class="m-10 md:m-24 mt-36 prose dark:prose-invert">
-            <h1 class="text-3xl font-bold mb-8">Search Results</h1>
-            <div v-for="(tools, url) in searchResults" :key="url" class="mb-8">
-                <a class="text-xl font-semibold mb-4 block" :href="`/${url}`">
-                    {{ url }}
-                </a>
-                <p :v-if="tools.length > 1 && tools[0].description"> {{ tools[0].description }} </p>
-                
-            </div>
-        </div>
-
-        <div v-else-if="loading" class="flex items-center justify-center h-screen">
-            <div class="flex flex-col items-center justify-center h-screen">
-                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-6"></div>
-                <p class="mt-10 text-xl font-semibold">Loading search...</p>
-            </div>
-        </div>
-
-        <Error
-            class="flex flex-col items-center justify-center h-screen"
-            v-else
-            :title="`${error.status}`"
-            :message="error.message"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import type { Tool } from '@/lib/types';
+import type { Tool } from '@/lib/types'
 
-const router = useRouter();
-const searchResults = ref({} as Record<string, Tool[]>);
-const error = ref({status: 0, message: ''});
-const loading = ref(true);
+const route = useRoute()
+const searchResults = ref({} as Record<string, Tool[]>)
+const error = ref({ status: 0, message: '' })
+const loading = ref(true)
 
-const fetchData = async (q: string) => {
-    // if the query is a github valid github url, we want to redirect to that tool's page
-    if (/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(q)) {
-        q = q.replace(/^https?:\/\//, '');
-        router.push(`/${q}`);
-        return;
-    }
+definePageMeta({
+  middleware: [
+    (_from, to) => {
+      // The computed value isn't available yet in a middleware
+      const q = `${ to.query.q }`.trim()
 
-    const results = await fetch(`/api/search?q=${q}`, { method: 'GET' });
-    if (!results.ok) {
-        error.value = { status: results.status, message: results.statusText };
-        loading.value = false;
-        return;
-    }
-    searchResults.value = await results.json() as Record<string, Tool[]>;
-    loading.value = false;
-};
+      if (!q) {
+        return navigateTo('/')
+      }
 
-onMounted(async () => fetchData(useRoute().query.q as string));
-onBeforeRouteUpdate((to) => {
-    fetchData(to.query.q as string);
-});
+      if (/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(q)) {
+        return navigateTo(`/${ q }`, { replace: true })
+      }
+    },
+  ],
+})
 
+const q = computed(() => {
+  return `${ route.query.q }`.trim()
+})
+
+async function fetchData() {
+  const results = await fetch(`/api/search?q=${ q.value }`)
+
+  if (!results.ok) {
+    error.value = { status: results.status, message: results.statusText }
+    loading.value = false
+
+    return
+  }
+
+  searchResults.value = await results.json() as Record<string, Tool[]>
+  loading.value = false
+}
+
+watch(() => route.query, () => fetchData())
+onMounted(() => fetchData())
 </script>
+
+<template>
+  <Loading v-if="loading" />
+  <Error v-else-if="error?.status || !searchResults" :title="`${error?.status || 0}`" :message="error?.message || 'Unknown'" />
+  <div v-else>
+    <h1 class="text-2xl font-semibold mb-8">
+      <template v-if="q === '.'">
+        All Tools
+      </template>
+      <template v-else>
+        Search Results: {{ q }}
+      </template>
+    </h1>
+
+    <MiniCard v-for="(tools, url) in searchResults" :key="url" class="mb-4">
+      <template #header>
+        <UButton variant="ghost" class="text-xl font-semibold block w-full" :to="`/${url}`">
+          {{ url }}
+        </UButton>
+      </template>
+
+      <div class="p-2">
+        <p v-if="tools?.[0]?.description">
+          {{ tools[0].description }}
+        </p>
+        <p v-else class="italic">
+          No description
+        </p>
+      </div>
+    </MiniCard>
+  </div>
+</template>

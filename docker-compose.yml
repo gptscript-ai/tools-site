@@ -18,7 +18,7 @@ services:
   db:
     image: postgres:16.2
     ports:
-      - "5432:5432"
+      - "3001:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -28,7 +28,7 @@ services:
       context: ./parser
       target: dev
     ports:
-      - "8080:8080"
+      - "3002:8080"
     volumes:
       - ./parser:/app
   indexer:

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repo
-      uses: actions/checkout@v3 
+      uses: actions/checkout@v3
 
     - name: Login to ghcr.io
       uses: docker/login-action@v1
@@ -26,7 +26,7 @@ jobs:
         context: .
         push: true
         tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-    
+
     - name: Deploy
       if: github.ref == 'refs/heads/main'
       env:
@@ -60,7 +60,7 @@ jobs:
         deploy_url: ${{ secrets.RENDER_DEPLOY_PARSER_HOOK_URL }}
       run: |
         curl "$deploy_url"
-        
+
   build_push_indexer:
     runs-on: ubuntu-latest
     steps:

@@ -1,15 +1,34 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  srcDir: 'src',
-  devtools: { enabled: true },
-  css: ['@/assets/css/main.css'],
+  components: true,
+  css:        ['@/assets/css/main.scss'],
+  colorMode:  { classSuffix: '' },
+  devtools:   { enabled: true },
+  devServer:  {
+    port:  3000,
+    https: {
+      cert: 'src/server/tls/localhost.crt',
+      key:  'src/server/tls/localhost.key',
+    },
+  },
   modules: [
     '@nuxt/ui',
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
   ],
   runtimeConfig: {
     databaseUrl: '', // NUXT_DATABASE_URL
-    parserUrl: '', // NUXT_PARSER_URL
+    parserUrl:   '', // NUXT_PARSER_URL
     githubToken: '', // NUXT_GITHUB_TOKEN
+  },
+  srcDir: 'src',
+  vite:   {
+    build: {
+      manifest:      true,
+      ssrManifest:   true,
+      sourcemap:     true,
+      rollupOptions: { output: { sourcemap: true } },
+    },
+
+    css: { devSourcemap: true },
   },
 })
