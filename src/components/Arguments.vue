@@ -18,7 +18,7 @@ const { tool } = defineProps<Props>()
             <td class="font-semibold">
               {{ arg }}
             </td>
-            <td>{{ ucFirst(`${properties.description.trim()}`) }}</td>
+            <td>{{ ucFirst(`${properties.description!.trim()}`) }}</td>
           </tr>
         </tbody>
       </table>

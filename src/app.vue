@@ -15,8 +15,8 @@ useHead({
     <div class="grid grid-rows-[60px,1fr] fixed top-0 right-0 bottom-0 left-0">
       <Navigation class="h-[60px]" />
       <div class="overflow-auto border-t-2 border-transparent">
-        <div class="p-5 lg:p-10 max-w-full w-full mx-auto lg:max-w-5xl">
-          <NuxtPage />
+        <div class="p-5 lg:p-10 max-w-full w-full h-full mx-auto lg:max-w-5xl">
+          <NuxtPage class="pb-10" />
         </div>
       </div>
     </div>
