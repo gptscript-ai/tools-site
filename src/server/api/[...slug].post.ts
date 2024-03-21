@@ -49,10 +49,10 @@ export default defineEventHandler(async (event) => {
   const [owner, repo, ...subdirs] = url.replace(/^(https?:\/\/)?(www\.)?github\.com\//, '').split('/')
 
   // construct the path to the tool.gpt file
-  const toolPath = subdirs.length > 0 ? `${ subdirs.join('/') }/tool.gpt` : 'tool.gpt'
+  const path = subdirs.length > 0 ? `${ subdirs.join('/') }` : ''
 
   // fetch the tool.gpt file from github
-  const toolResponse = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/main/${ toolPath }`)
+  const toolResponse = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/main/${ path }/tool.gpt`)
 
   if (!toolResponse.ok) {
     // clean-up any existing tools if the tool.gpt file is no longer found or is private
@@ -94,32 +94,32 @@ export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Content-Type', 'application/json')
   setResponseStatus(event, 201)
 
-  return await db.upsertToolForUrl(url, parsedTools, await getExamples(owner, repo),
+  return await db.upsertToolForUrl(url, parsedTools, await getExamples(owner, repo, path),
   )
 })
 
 // getExamples fetches the examples from the repo located at github.com/owner/repo and returns them as an array of ToolExample objects
-async function getExamples(owner: string, repo: string): Promise<ToolExample[]> {
+async function getExamples(owner: string, repo: string, path: string): Promise<ToolExample[]> {
   const octokit = new Octokit({ auth: useRuntimeConfig().githubToken })
-
+  let gptFiles: ToolExample[] = []
   try {
     // Get the contents of the examples directory
     const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner,
       repo,
-      path: 'examples',
-      ref:  'main', // Replace 'main' with the desired branch name
+      path: path+'/examples',
+      ref:  'main',
     })
 
     // Filter the response to include only .gpt files
     const gptExamples = (response.data as any[]).filter((file: any) => file.type === 'file' && file.name.endsWith('.gpt'))
 
-    const gptFiles: ToolExample[] = await Promise.all(gptExamples.map(async (example: any) => {
+    gptFiles = await Promise.all(gptExamples.map(async (example: any) => {
       const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
         owner,
         repo,
         path: example.path,
-        ref:  'main', // Replace 'main' with the desired branch name
+        ref:  'main',
       })
 
       const content = Buffer.from((response.data as any).content, 'base64').toString()
@@ -127,9 +127,17 @@ async function getExamples(owner: string, repo: string): Promise<ToolExample[]> 
 
       return { name: example.name, url: githubLink, content }
     }))
-
-    return gptFiles
   } catch (e) {
-    return []
+    // if the error is not a 404, throw it
+    if ((e as any).status !== 404) { throw e }
   }
+
+  // Fetch the example.gpt file if it exists
+  const exampleDotGPT = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/main/${path}/example.gpt`)
+  if (exampleDotGPT.ok) {
+    const content = await exampleDotGPT.text()
+    gptFiles.push({ name: 'example.gpt', url: `https://github.com/${ owner }/${ repo }/blob/main/${path}/example.gpt`, content }) 
+  }
+
+  return gptFiles
 }
