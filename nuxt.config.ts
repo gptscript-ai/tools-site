@@ -26,7 +26,6 @@ export default defineNuxtConfig({
       manifest:      true,
       ssrManifest:   true,
       sourcemap:     true,
-      rollupOptions: { output: { sourcemap: true } },
     },
 
     css: { devSourcemap: true },
