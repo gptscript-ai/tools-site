@@ -17,7 +17,7 @@ const featured: Tool[] = [
 <template>
   <div class="h-[90vh] text-center justify-start md:justify-center items-center p-10 flex flex-col">
     <h2 class="text-4xl md:text-5xl mb-4 mx-2">
-      Welcome to tools.gptscript.ai
+      Welcome to the GPTScript Toolbox
     </h2>
     <h3 class="text-lg text-gray-500 mb-4">
       Looking for something?
