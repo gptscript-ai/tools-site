@@ -1,13 +1,14 @@
 {
-  "name": "tools",
+  "name": "@gptscript-ai/tools",
   "private": true,
   "type": "module",
   "scripts": {
     "up": "docker compose up --build",
     "down": "docker compose down",
     "build": "nuxt build",
-    "dev": "nuxt dev",
-    "dev:migrate": "npx prisma migrate deploy && yarn dev",
+    "dev": "nuxt dev --host",
+    "dev:migrate": "npx prisma migrate deploy && yarn dev --host",
+    "lint": "eslint --max-warnings 0 .",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -19,20 +20,23 @@
   "dependencies": {
     "@octokit/core": "^6.0.1",
     "@prisma/client": "^5.11.0",
-    "nuxt": "^3.10.3",
-    "sequelize": "^6.37.1",
-    "vue": "^3.4.19",
-    "vue-router": "^4.3.0"
+    "sequelize": "^6.37.1"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "2.8.3",
+    "@heroicons/vue": "^2.1.1",
+    "@nuxt/devtools": "1.0.8",
     "@nuxt/ui": "^2.14.2",
+    "@nuxtjs/color-mode": "^3.3.2",
     "@tailwindcss/typography": "^0.5.10",
-    "@types/markdown-it": "^13.0.7",
     "@types/pg": "^8.11.2",
-    "autoprefixer": "^10.4.18",
-    "postcss": "^8.4.35",
-    "postcss-custom-properties": "^13.3.6",
+    "eslint": "^8.57.0",
+    "nuxt": "^3.10.3",
     "prisma": "^5.11.0",
-    "tailwindcss": "^3.4.1"
+    "sass": "^1.71.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "vue": "^3.4.19",
+    "vue-router": "^4.3.0"
   }
 }

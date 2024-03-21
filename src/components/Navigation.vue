@@ -1,39 +1,63 @@
-<template>
-    <nav class="navbar bg-dark-gray p-4 flex justify-between items-center" style="height: 60px;">
-        <div class="flex items-center h-full">
-            <ul class="flex space-x-6 items-center">
-                <li class="flex items-center">
-                    <nuxt-link to="/" class="">
-                        <img src="@/assets/img/logo.svg" alt="Logo" class="h-10 w-10 mr-2">
-                    </nuxt-link>
-                    <nuxt-link to="/" class="text-white hover:text-green-300 hidden sm:block">GPTScript</nuxt-link>
-                </li>
-            </ul>
-        </div>
-        <div class="flex items-center h-full">
-            <ul class="flex md:space-x-6 items-center">
-                <li><Search :placeholder="placeHolder" /></li>
-                <li class="hidden md:block"><router-link to="/search?q=." class="text-white hover:text-green-300">
-                    All Tools <UIcon name="i-heroicons-arrow-top-right-on-square"/>
-                </router-link></li>
-                <li class="hidden md:block"><a :href="githubLink" class="text-white hover:text-green-300">
-                    GitHub <UIcon name="i-heroicons-arrow-top-right-on-square"/>
-                </a></li>
-                <li class="hidden md:block"><a :href="docsLink" class="text-white hover:text-green-300">
-                    Docs <UIcon name="i-heroicons-arrow-top-right-on-square"/>
-                </a></li>
-                <li><DisplayMode/></li>
-            </ul>
-        </div>
-    </nav>
-</template>
-
 <script setup>
-import { links } from '@/lib/links.ts';
-import { ref } from 'vue';
+import { links } from '@/lib/links.ts'
 
-const placeHolder = ref('Search for a tool...');
-
-const githubLink = ref(links.github);
-const docsLink = ref(links.docs);
+const route = useRoute()
+const mobileSearch = ref(false)
 </script>
+
+<template>
+  <nav class="navbar bg-gray-800">
+    <ul class="flex justfiy-between items-center p-4 h-full">
+      <li class="text-nowrap">
+        <nuxt-link to="/">
+          <img src="@/assets/img/logo.svg" alt="Logo" class="h-10 mr-2 inline">
+          <img src="@/assets/img/logotype.svg" alt="Logo" class="invert hidden md:inline" style="height: 30px">
+        </nuxt-link>
+      </li>
+
+      <li class="flex-grow" />
+
+      <template v-if="route.name !== 'index'">
+        <template v-if="mobileSearch">
+          <li class="flex-grow">
+            <Search placeholder="Search for a tool…" class="w-full" />
+          </li>
+          <li>
+            <UButton icon="i-heroicons-x-mark" size="xs" class="relative left-2 z-100" @click="mobileSearch = false" />
+          </li>
+        </template>
+        <template v-else>
+          <li class="hidden md:flex md:w-64 lg:w-96 mr-2">
+            <Search placeholder="Search for a tool…" />
+          </li>
+          <li class="md:hidden">
+            <UButton variant="link" icon="i-heroicons-magnifying-glass" @click="mobileSearch = true" />
+          </li>
+        </template>
+      </template>
+
+      <template v-if="!mobileSearch">
+        <li class="text-nowrap">
+          <UButton variant="link" to="/search?q=.">
+            All Tools
+          </UButton>
+        </li>
+        <li class="text-nowrap">
+          <UButton variant="link" :to="links.github" target="_blank" rel="nofollow noopener noreferrer">
+            GitHub
+            <UIcon name="i-heroicons-arrow-top-right-on-square" class="hidden md:inline-block align-text-top" />
+          </UButton>
+        </li>
+        <li class="text-nowrap">
+          <UButton variant="link" :to="links.docs" target="_blank" rel="nofollow noopener noreferrer">
+            Docs
+            <UIcon name="i-heroicons-arrow-top-right-on-square" class="hidden md:inline-block align-text-top" />
+          </UButton>
+        </li>
+        <li>
+          <DisplayMode />
+        </li>
+      </template>
+    </ul>
+  </nav>
+</template>

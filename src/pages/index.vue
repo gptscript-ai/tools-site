@@ -1,31 +1,46 @@
+<script setup lang="ts">
+interface Tool {
+  icon?: string
+  name:  string
+  link:  string
+}
+
+const featured: Tool[] = [
+  { name: 'Search', icon: 'i-heroicons-magnifying-glass', link: '/github.com/gptscript-ai/search/brave' },
+  { name: 'Vision', icon: 'i-heroicons-camera', link: '/github.com/gptscript-ai/vision' },
+  { name: 'Image Generation', icon: 'i-heroicons-paint-brush', link: '/github.com/gptscript-ai/image-generation' },
+  { name: 'Browser', icon: 'i-heroicons-tv', link: '/github.com/gptscript-ai/browser' },
+  { name: 'System Tools', icon: 'i-heroicons-wrench', link: '/search?q=.' },
+]
+</script>
+
 <template>
-    <div class="flex flex-col justify-center items-center min-h-screen">
-        <div class="w-full justify-center items-center mt-60 md:mt-24">
-            <div class="text-center mb-10 max-w-screen">
-                <h2 class="text-4xl md:text-5xl mb-4 mx-2">Welcome to tools.gptscript.ai</h2>
-                <h3 class="text-lg text-gray-500 mx-10">Looking for something? There's probably a tool for it.</h3>
-            </div>
-            <div class="w-full mx-auto px-10">
-                <Search class="w-full md:w-3/4 lg:w-1/2":placeholder="'Search for a tool or enter a GitHub URL to index one...'" />
-                <UDivider class="sm:w-full md:hidden mx-auto mt-10 mb-5" :ui="{ label: 'text-gray-500 text-lg font-normal' }" />
-                <div class="flex justify-center flex-col md:flex-row">
-                    <ULink to="/github.com/gptscript-ai/search/brave" class="text-center rounded hover:text-green-400 p-4 m-2 text-lg">
-                        <UIcon name="i-heroicons-magnifying-glass"/> Search
-                    </ULink>
-                    <ULink to="/github.com/gptscript-ai/vision" class="text-center rounded hover:text-green-400  p-4 m-2 text-lg">
-                        <UIcon name="i-heroicons-camera"/> Vision
-                    </ULink>
-                    <ULink to="/github.com/gptscript-ai/image-generation" class="text-center rounded hover:text-green-400  p-4 m-2 text-lg">
-                        <UIcon name="i-heroicons-paint-brush"/> Image Generation 
-                    </ULink>
-                    <ULink to="/github.com/gptscript-ai/browser" class="text-center rounded hover:text-green-400  p-4 m-2 text-lg">
-                        <UIcon name="i-heroicons-tv"/> Browser 
-                    </ULink>
-                    <ULink to="/search?q=sys." class="text-center rounded hover:text-green-400  p-4 m-2 text-lg">
-                        <UIcon name="i-heroicons-wrench"/> System Tools
-                    </ULink>
-                </div>
-            </div>
-        </div>
+  <div class="min-h-full text-center justify-start md:justify-center items-center p-10 flex flex-col">
+    <h2 class="text-4xl md:text-5xl mb-4 mx-2">
+      Welcome to tools.gptscript.ai
+    </h2>
+    <h3 class="text-lg text-gray-500 mb-4">
+      Looking for something?
+      <br class="md:hidden">
+      There's probably a tool for it.
+    </h3>
+
+    <Search class="inline-block w-[100%] md:w-[50vw] mb-1" size="xl" placeholder="Search for a tool or enter a GitHub URL to index one…" />
+
+    <UDivider class="md:hidden my-10" :ui="{ label: 'text-gray-500 text-lg font-normal' }" />
+
+    <div class="flex justify-center flex-col md:w-initial md:flex-row">
+      <UButton
+        v-for="(tool, idx) in featured"
+        :key="idx"
+        :icon="tool.icon"
+        :to="tool.link"
+        size="lg"
+        variant="ghost"
+        class="m-1 flex-grow md:flex-initial"
+      >
+        {{ tool.name }}
+      </UButton>
     </div>
+  </div>
 </template>
