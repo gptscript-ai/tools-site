@@ -4,7 +4,7 @@ description: Finds a tool that matches the prompt provided, if one exists.
 args: prompt: Prompt that describes a tool to be found
 
 Do each of the following one after the other.
-1. Go to "https://tools.gptscript.ai/api/search". DO NOT CHANGE THIS URL IN ANY WAY.
+1. Go to "https://tools.gptscript.ai/api/search?page=-1". DO NOT CHANGE THIS URL IN ANY WAY.
 2. From the response, look for a tool that is described by ${prompt}.
 3. Return a list of names and URLs for each tool you find. Each URL should be in
    the form of https://tools.gptscript.ai/{github url without https://}. If more than one

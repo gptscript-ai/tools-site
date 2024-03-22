@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import type { Tool, ToolExample } from '@/lib/types'
 
 const prisma = new PrismaClient()
+const all = -1
 
 export async function getToolsForUrl(url: string): Promise<{ tools: Tool[], examples: ToolExample[], lastIndexedAt: Date }> {
   const toolEntry = await prisma.toolEntry.findFirst({
@@ -91,8 +92,8 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
   const skip = (page - 1) * pageSize
   const toolEntries = await prisma.toolEntry.findMany({
     where: { reference: { contains: query } },
-    take: pageSize,
-    skip: skip > 0 ? skip : undefined,
+    take:  page != all ? pageSize : undefined,
+    skip: skip > 0 && page != all ? skip : undefined,
   })
 
   const tools: Record<string, Tool[]> = {}
