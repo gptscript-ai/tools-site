@@ -9,6 +9,7 @@ const error = ref({ status: 0, message: '' })
 const loading = ref(true)
 const page = ref(1)
 const totalItems = ref(0)
+const isWindowScrolled = ref(false)
 
 definePageMeta({
   middleware: [
@@ -31,6 +32,7 @@ const q = computed(() => {
 })
 
 async function fetchData() {
+  loading.value = true
   const results = await fetch(`/api/search?q=${ q.value }&page=${page.value}`)
 
   if (!results.ok) {
