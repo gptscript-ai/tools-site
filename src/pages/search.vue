@@ -9,7 +9,6 @@ const error = ref({ status: 0, message: '' })
 const loading = ref(true)
 const page = ref(1)
 const totalItems = ref(0)
-const isWindowScrolled = ref(false)
 
 definePageMeta({
   middleware: [
@@ -73,7 +72,7 @@ async function onPageChange(newPage: number) {
       </template>
     </h1>
 
-    <UPagination class="my-8" v-if="totalItems > pageSize" v-model="page" :page-count="10" :total="totalItems" @change="onPageChange" />
+    <UPagination size="lg" class="my-8" v-if="totalItems > pageSize" v-model="page" :page-count="10" :total="totalItems" @change="onPageChange" />
 
     <MiniCard v-for="(tools, url) in searchResults" :key="url" class="mb-4">
       <template #header>
@@ -92,7 +91,7 @@ async function onPageChange(newPage: number) {
       </div>
     </MiniCard>
 
-    <UPagination class="my-8" v-if="totalItems > pageSize" v-model="page" :page-count="10" :total="totalItems" @change="onPageChange" />
+    <UPagination size="lg" class="my-8" v-if="totalItems > pageSize" v-model="page" :page-count="10" :total="totalItems" @change="onPageChange" />
 
   </div>
 </template>
