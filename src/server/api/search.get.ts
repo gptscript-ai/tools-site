@@ -1,7 +1,9 @@
 import * as db from '@/lib/db'
 
+const pageSize = 10
+
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Content-Type', 'application/json')
-
-  return await db.getToolsForQuery(getQuery(event).q as string)
+  const {q, page} = getQuery(event)
+  return await db.getToolsForQuery(q as string, page as number, pageSize)
 })

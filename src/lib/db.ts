@@ -87,22 +87,22 @@ export async function removeToolForUrlIfExists(url: string): Promise<Tool[]> {
   return toolEntry.content as Tool[]
 }
 
-export async function getToolsForQuery(query: string): Promise<Record<string, Tool[]>> {
-  const toolEntries = await prisma.toolEntry.findMany({ where: { reference: { contains: query } } })
+export async function getToolsForQuery(query: string, page: number, pageSize: number): Promise<{ tools: Record<string, Tool[]>, totalCount: number }> {
+  const skip = (page - 1) * pageSize
+  const toolEntries = await prisma.toolEntry.findMany({
+    where: { reference: { contains: query } },
+    take: pageSize,
+    skip: skip > 0 ? skip : undefined,
+  })
 
   const tools: Record<string, Tool[]> = {}
 
   for (const entry of toolEntries) {
     const parsedTool = entry.content as Tool[]
-
-    for (const tool of parsedTool) {
-      if (tools[entry.reference]) {
-        tools[entry.reference].push(tool)
-      } else {
-        tools[entry.reference] = [tool]
-      }
-    }
+    tools[entry.reference] = tools[entry.reference] || []
+    tools[entry.reference].push(...parsedTool)
   }
 
-  return tools
+  const totalCount = await prisma.toolEntry.count({ where: { reference: { contains: query } } })
+  return { tools, totalCount }
 }
