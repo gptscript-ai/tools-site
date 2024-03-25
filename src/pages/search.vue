@@ -89,8 +89,5 @@ async function onPageChange(newPage: number) {
         </p>
       </div>
     </MiniCard>
-
-    <UPagination size="lg" class="my-8" v-if="totalItems > pageSize" v-model="page" :page-count="10" :total="totalItems" @change="onPageChange" />
-
   </div>
 </template>
