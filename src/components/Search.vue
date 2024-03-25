@@ -8,7 +8,12 @@ watch(() => [route.path, route.query], () => {
 })
 
 function submitSearch() {
-  navigateTo({ name: 'search', query: { q: searchTerm.value } })
+  // if searchTerm is a valid github URL, navigate to its tool page
+  if (/^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/[\w-]+(\/[\w-]+)*$/.test(searchTerm.value)) {
+    useRouter().push(`/${searchTerm.value.replace(/^https?:\/\//, '')}`)
+  } else {
+    navigateTo({ name: 'search', query: { q: searchTerm.value } })
+  }
 }
 </script>
 

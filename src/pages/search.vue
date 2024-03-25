@@ -41,7 +41,6 @@ async function fetchData() {
   }
 
   const { tools, totalCount } = await results.json()
-  console.log(totalCount)
   searchResults.value = tools
   totalItems.value = totalCount
   loading.value = false
