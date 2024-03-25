@@ -16,6 +16,12 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
   ],
   runtimeConfig: {
+    public: {
+      // Anything in here is exposed to the client, do not put secrets in here
+      googleAnalytics: '', // NUXT_PUBLIC_GOOGLE_ANALYTICS
+    },
+
+    // Things in this section are private and only available on the server side
     databaseUrl: '', // NUXT_DATABASE_URL
     parserUrl:   '', // NUXT_PARSER_URL
     githubToken: '', // NUXT_GITHUB_TOKEN
