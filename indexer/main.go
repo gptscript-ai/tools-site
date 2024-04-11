@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -23,9 +24,17 @@ func main() {
 		log.Fatal("DB_URL environment variable is not set")
 	}
 
-	apiURL := os.Getenv("API_URL")
-	if apiURL == "" {
+	apiURLString := os.Getenv("API_URL")
+	if apiURLString == "" {
 		log.Fatal("API_URL environment variable is not set")
+	}
+
+	apiURL, err := url.Parse(apiURLString)
+	if err != nil {
+		log.Fatal("Failed to parse api url")
+	}
+	if apiURL.Scheme == "" {
+		apiURL.Scheme = "http"
 	}
 
 	db, err := sql.Open("postgres", dbConnectionString)
@@ -68,7 +77,7 @@ func insertSystemTools(db *sql.DB) {
 
 // reindexRemoteTools reindexes all of the current remote tools in the database. If
 // an error occurs, it logs the error and continues to the next tool.
-func reindexRemoteTools(db *sql.DB, apiURL string) {
+func reindexRemoteTools(db *sql.DB, apiURL *url.URL) {
 	rows, err := db.Query(`
 		SELECT *
 		FROM public."ToolEntry"
@@ -98,8 +107,8 @@ func reindexRemoteTools(db *sql.DB, apiURL string) {
 			continue
 		}
 
-		url := apiURL + "/" + reference
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte{}))
+		url := apiURL.JoinPath(reference)
+		req, err := http.NewRequest("POST", url.String(), bytes.NewBuffer([]byte{}))
 		if err != nil {
 			log.Fatal(err)
 		}
