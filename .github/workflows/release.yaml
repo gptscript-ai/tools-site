@@ -77,6 +77,6 @@ jobs:
     - name: Build and push the image
       uses: docker/build-push-action@v2
       with:
-        context: ./parser
+        context: ./indexer
         push: true
         tags: ghcr.io/${{ github.repository }}/indexer:${{ github.ref_name }}
