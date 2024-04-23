@@ -15,6 +15,10 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/tailwindcss',
   ],
+  routeRules:    {
+    // Allow cross-origin requests for the API (GPTStudio needs this)
+    '/api/**': { cors: true },
+  },
   runtimeConfig: {
     public: {
       // Anything in here is exposed to the client, do not put secrets in here
