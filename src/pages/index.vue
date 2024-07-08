@@ -6,7 +6,7 @@ interface Tool {
 }
 
 const featured: Tool[] = [
-  { name: 'Search', icon: 'i-heroicons-magnifying-glass', link: '/github.com/gptscript-ai/search/brave' },
+  { name: 'Search', icon: 'i-heroicons-magnifying-glass', link: '/github.com/gptscript-ai/answers-from-the-internet' },
   { name: 'Vision', icon: 'i-heroicons-camera', link: '/github.com/gptscript-ai/vision' },
   { name: 'Image Generation', icon: 'i-heroicons-paint-brush', link: '/github.com/gptscript-ai/image-generation' },
   { name: 'Browser', icon: 'i-heroicons-tv', link: '/github.com/gptscript-ai/browser' },
