@@ -1,8 +1,10 @@
 import { Octokit } from '@octokit/core'
 import * as db from '@/lib/db'
-import type { Tool, ToolExample } from '@/lib/types'
+import type { ParserResponse, Tool, ToolExample } from '@/lib/types'
 
 export default defineEventHandler(async (event) => {
+  const octokit = new Octokit({ auth: useRuntimeConfig().githubToken })
+
   // grab the github URL from the path and check that it is valid
   const url = event.path.replace(/^\/api\//, '').split('?')[0]
 
@@ -48,11 +50,17 @@ export default defineEventHandler(async (event) => {
   // grab the owner, repo and subdirs from the URL if they exist
   const [owner, repo, ...subdirs] = url.replace(/^(https?:\/\/)?(www\.)?github\.com\//, '').split('/')
 
+  // find the default branch name
+  const branchResponse = await octokit.request(`GET https://api.github.com/repos/${ owner }/${ repo }`)
+  const branch = branchResponse.data.default_branch
+
   // construct the path to the tool.gpt file
   const path = subdirs.length > 0 ? `${ subdirs.join('/') }` : ''
 
   // fetch the tool.gpt file from github
-  const toolResponse = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/main/${ path }/tool.gpt`)
+  const toolResponse = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/${ branch }/${ path }/tool.gpt`)
+  console.log(toolResponse)
+  console.log(`Owner: ${owner}, Repo: ${repo}, Path: ${path}`)
 
   if (!toolResponse.ok) {
     // clean-up any existing tools if the tool.gpt file is no longer found or is private
@@ -81,26 +89,35 @@ export default defineEventHandler(async (event) => {
   }
 
   // if the parser returns no tools, return an error
-  const parsedTools = JSON.parse(await parserResponse.text()) as Tool[]
+  const parserNodes = JSON.parse(await parserResponse.text()) as ParserResponse
 
-  if (parsedTools.length === 0) {
+  if (parserNodes.nodes.length === 0) {
     throw createError({
       statusCode:    400,
       statusMessage: 'No tools found in file',
     })
   }
 
+  const tools = parserNodes.nodes.flatMap(node => {
+    if (node.toolNode) {
+      return node.toolNode.tool
+    }
+    return {
+      instructions: node.textNode!.text
+    }
+  })
+  console.log(tools)
+
   // upsert the tool into the database and return the tool
   setResponseHeader(event, 'Content-Type', 'application/json')
   setResponseStatus(event, 201)
 
-  return await db.upsertToolForUrl(url, parsedTools, await getExamples(owner, repo, path),
+  return await db.upsertToolForUrl(url, tools, await getExamples(owner, repo, path, octokit),
   )
 })
 
 // getExamples fetches the examples from the repo located at github.com/owner/repo and returns them as an array of ToolExample objects
-async function getExamples(owner: string, repo: string, path: string): Promise<ToolExample[]> {
-  const octokit = new Octokit({ auth: useRuntimeConfig().githubToken })
+async function getExamples(owner: string, repo: string, path: string, octokit: Octokit): Promise<ToolExample[]> {
   let gptFiles: ToolExample[] = []
   try {
     // Get the contents of the examples directory

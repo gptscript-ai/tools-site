@@ -29,6 +29,19 @@ interface ToolSource {
   lineNo?:   number
 }
 
+export interface ParserResponse {
+  nodes: ParserNode[]
+}
+
+export interface ParserNode {
+  toolNode?: {
+    tool: Tool
+  }
+  textNode?: {
+    text: string
+  }
+}
+
 interface JSONSchema {
   property:              Property
   id?:                   string

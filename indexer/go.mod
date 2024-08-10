@@ -1,4 +1,4 @@
-module github.com/gptscript-ai/tools/indexer
+module github.com/gptscript-ai/tools-site/indexer
 
 go 1.22.1
 
