@@ -59,8 +59,6 @@ export default defineEventHandler(async (event) => {
 
   // fetch the tool.gpt file from github
   const toolResponse = await fetch(`https://raw.githubusercontent.com/${ owner }/${ repo }/${ branch }/${ path }/tool.gpt`)
-  console.log(toolResponse)
-  console.log(`Owner: ${owner}, Repo: ${repo}, Path: ${path}`)
 
   if (!toolResponse.ok) {
     // clean-up any existing tools if the tool.gpt file is no longer found or is private
@@ -98,7 +96,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const tools = parserNodes.nodes.flatMap(node => {
+  const tools = parserNodes.nodes.map(node => {
     if (node.toolNode) {
       return node.toolNode.tool
     }
@@ -106,7 +104,6 @@ export default defineEventHandler(async (event) => {
       instructions: node.textNode!.text
     }
   })
-  console.log(tools)
 
   // upsert the tool into the database and return the tool
   setResponseHeader(event, 'Content-Type', 'application/json')
