@@ -10,7 +10,7 @@ RUN go build -o main .
 FROM cosmtrek/air AS dev
 WORKDIR /app
 COPY . .
-RUN go get github.com/cosmtrek/air
+RUN go get github.com/air-verse/air
 CMD ["air"]
 
 # Production stage
