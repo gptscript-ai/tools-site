@@ -90,20 +90,71 @@ export async function removeToolForUrlIfExists(url: string): Promise<Tool[]> {
 
 export async function getToolsForQuery(query: string, page: number, pageSize: number): Promise<{ tools: Record<string, Tool[]>, totalCount: number }> {
   const skip = (page - 1) * pageSize
-  const toolEntries = await prisma.toolEntry.findMany({
-    where: { reference: { contains: query } },
-    take:  page != all ? pageSize : undefined,
+
+  const toolEntriesWithReference = await prisma.toolEntry.findMany({
+    where: {
+      reference: {
+        contains: query,
+        mode: 'insensitive'
+      }
+    },
+    take: page != all ? pageSize : undefined,
+    skip: skip > 0 && page != all ? skip : undefined,
+  })
+
+  const toolEntriesWithDescription = await prisma.toolEntry.findMany({
+    where: {
+      AND: [
+        {
+          description: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          NOT: {
+            reference: {
+              contains: query,
+              mode: 'insensitive'
+            }
+          }
+        }
+      ]
+    },
+    take: page != all ? pageSize : undefined,
     skip: skip > 0 && page != all ? skip : undefined,
   })
 
   const tools: Record<string, Tool[]> = {}
 
-  for (const entry of toolEntries) {
+  for (const entry of toolEntriesWithReference) {
     const parsedTool = entry.content as Tool[]
     tools[entry.reference] = tools[entry.reference] || []
     tools[entry.reference].push(...parsedTool)
   }
 
-  const totalCount = await prisma.toolEntry.count({ where: { reference: { contains: query } } })
-  return { tools, totalCount }
+  for (const entry of toolEntriesWithDescription) {
+    const parsedTool = entry.content as Tool[]
+    tools[entry.reference] = tools[entry.reference] || []
+    tools[entry.reference].push(...parsedTool)
+  }
+
+  return { tools, totalCount: toolEntriesWithReference.length + toolEntriesWithDescription.length }
+}
+
+export async function migrateToolEntryDescriptions() {
+  const toolEntries = await prisma.toolEntry.findMany({ where: { description: { equals: null } } })
+
+  for (const entry of toolEntries) {
+    if (entry.content) {
+      const tools = entry.content as Tool[]
+      if (tools.length > 0) {
+        if (!tools[0].description) {
+          // If there is no description, set an empty string so that we don't try to migrate it again.
+          tools[0].description = ''
+        }
+        await prisma.toolEntry.update({ where: { id: entry.id }, data: { description: tools[0].description } })
+      }
+    }
+  }
 }

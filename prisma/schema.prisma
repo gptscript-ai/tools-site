@@ -18,6 +18,7 @@ model ToolEntry {
   createdAt     DateTime  @default(now())
   lastIndexedAt DateTime  @updatedAt
   content       Json
+  description   String?
   reference     String    @unique
   examples      Example[]
   systemTool    Boolean   @default(false)
