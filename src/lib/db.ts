@@ -91,6 +91,7 @@ export async function removeToolForUrlIfExists(url: string): Promise<Tool[]> {
 export async function getToolsForQuery(query: string, page: number, pageSize: number): Promise<{ tools: Record<string, Tool[]>, totalCount: number }> {
   const skip = (page - 1) * pageSize
 
+  // First get the tools whose name (GitHub reference) contains the query
   const toolEntriesWithReference = await prisma.toolEntry.findMany({
     where: {
       reference: {
@@ -102,6 +103,7 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
     skip: skip > 0 && page != all ? skip : undefined,
   })
 
+  // Next, get the tools whose description contains the query
   const toolEntriesWithDescription = await prisma.toolEntry.findMany({
     where: {
       AND: [
@@ -127,6 +129,7 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
 
   const tools: Record<string, Tool[]> = {}
 
+  // Add them to the results so that the ones with the query in the reference come first
   for (const entry of toolEntriesWithReference) {
     const parsedTool = entry.content as Tool[]
     tools[entry.reference] = tools[entry.reference] || []
@@ -139,22 +142,24 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
     tools[entry.reference].push(...parsedTool)
   }
 
-  return { tools, totalCount: toolEntriesWithReference.length + toolEntriesWithDescription.length }
-}
-
-export async function migrateToolEntryDescriptions() {
-  const toolEntries = await prisma.toolEntry.findMany({ where: { description: { equals: null } } })
-
-  for (const entry of toolEntries) {
-    if (entry.content) {
-      const tools = entry.content as Tool[]
-      if (tools.length > 0) {
-        if (!tools[0].description) {
-          // If there is no description, set an empty string so that we don't try to migrate it again.
-          tools[0].description = ''
+  const totalCount = await prisma.toolEntry.count({
+    where: {
+      OR: [
+        {
+          reference: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          description: {
+            contains: query,
+            mode: 'insensitive'
+          }
         }
-        await prisma.toolEntry.update({ where: { id: entry.id }, data: { description: tools[0].description } })
-      }
+      ]
     }
-  }
+  })
+
+  return { tools, totalCount }
 }
