@@ -59,13 +59,14 @@ func insertSystemTools(db *sql.DB) {
 		}
 
 		_, err = db.Exec(`
-			INSERT INTO public."ToolEntry" (reference, content, "systemTool", "lastIndexedAt")
-			VALUES ($1, $2, $3, NOW())
+			INSERT INTO public."ToolEntry" (reference, content, "systemTool", description, "lastIndexedAt")
+			VALUES ($1, $2, $3, $4, NOW())
 			ON CONFLICT (reference) DO UPDATE
-			SET "content" = $2, "systemTool" = $3, "lastIndexedAt" = NOW()`,
+			SET "content" = $2, "systemTool" = $3, "description" = $4, "lastIndexedAt" = NOW()`,
 			tool.Name,
 			string(toolAsJSON),
 			true,
+			tool.Description,
 		)
 
 		if err != nil {
@@ -93,12 +94,13 @@ func reindexRemoteTools(db *sql.DB, apiURL *url.URL) {
 			index         string
 			reference     string
 			content       string
+			description   string
 			lastIndexedAt string
 			createdAt     string
 			systemTool    bool
 		)
 
-		err = rows.Scan(&index, &createdAt, &lastIndexedAt, &content, &reference, &systemTool)
+		err = rows.Scan(&index, &createdAt, &lastIndexedAt, &content, &reference, &systemTool, &description)
 		if err != nil {
 			log.Fatal(err)
 		}

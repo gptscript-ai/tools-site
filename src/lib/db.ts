@@ -90,20 +90,76 @@ export async function removeToolForUrlIfExists(url: string): Promise<Tool[]> {
 
 export async function getToolsForQuery(query: string, page: number, pageSize: number): Promise<{ tools: Record<string, Tool[]>, totalCount: number }> {
   const skip = (page - 1) * pageSize
-  const toolEntries = await prisma.toolEntry.findMany({
-    where: { reference: { contains: query } },
-    take:  page != all ? pageSize : undefined,
+
+  // First get the tools whose name (GitHub reference) contains the query
+  const toolEntriesWithReference = await prisma.toolEntry.findMany({
+    where: {
+      reference: {
+        contains: query,
+        mode: 'insensitive'
+      }
+    },
+    take: page != all ? pageSize : undefined,
+    skip: skip > 0 && page != all ? skip : undefined,
+  })
+
+  // Next, get the tools whose description contains the query
+  const toolEntriesWithDescription = await prisma.toolEntry.findMany({
+    where: {
+      AND: [
+        {
+          description: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          NOT: {
+            reference: {
+              contains: query,
+              mode: 'insensitive'
+            }
+          }
+        }
+      ]
+    },
+    take: page != all ? pageSize : undefined,
     skip: skip > 0 && page != all ? skip : undefined,
   })
 
   const tools: Record<string, Tool[]> = {}
 
-  for (const entry of toolEntries) {
+  // Add them to the results so that the ones with the query in the reference come first
+  for (const entry of toolEntriesWithReference) {
     const parsedTool = entry.content as Tool[]
     tools[entry.reference] = tools[entry.reference] || []
     tools[entry.reference].push(...parsedTool)
   }
 
-  const totalCount = await prisma.toolEntry.count({ where: { reference: { contains: query } } })
+  for (const entry of toolEntriesWithDescription) {
+    const parsedTool = entry.content as Tool[]
+    tools[entry.reference] = tools[entry.reference] || []
+    tools[entry.reference].push(...parsedTool)
+  }
+
+  const totalCount = await prisma.toolEntry.count({
+    where: {
+      OR: [
+        {
+          reference: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          description: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        }
+      ]
+    }
+  })
+
   return { tools, totalCount }
 }
