@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 import { PrismaClient } from '@prisma/client'
 import type { Tool, ToolExample } from '@/lib/types'
+import { FeaturedTools } from '@/lib/featured'
 
 const prisma = new PrismaClient()
 const all = -1
@@ -127,19 +128,30 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
     skip: skip > 0 && page != all ? skip : undefined,
   })
 
+  const featured: Record<string, Tool[]> = {}
   const tools: Record<string, Tool[]> = {}
 
   // Add them to the results so that the ones with the query in the reference come first
   for (const entry of toolEntriesWithReference) {
     const parsedTool = entry.content as Tool[]
-    tools[entry.reference] = tools[entry.reference] || []
-    tools[entry.reference].push(...parsedTool)
+    if (FeaturedTools[entry.reference]) {
+      featured[entry.reference] = featured[entry.reference] || []
+      featured[entry.reference].push(...parsedTool)
+    } else {
+      tools[entry.reference] = tools[entry.reference] || []
+      tools[entry.reference].push(...parsedTool)
+    }
   }
 
   for (const entry of toolEntriesWithDescription) {
     const parsedTool = entry.content as Tool[]
-    tools[entry.reference] = tools[entry.reference] || []
-    tools[entry.reference].push(...parsedTool)
+    if (FeaturedTools[entry.reference]) {
+      featured[entry.reference] = featured[entry.reference] || []
+      featured[entry.reference].push(...parsedTool)
+    } else {
+      tools[entry.reference] = tools[entry.reference] || []
+      tools[entry.reference].push(...parsedTool)
+    }
   }
 
   const totalCount = await prisma.toolEntry.count({
@@ -161,5 +173,5 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
     }
   })
 
-  return { tools, totalCount }
+  return { tools: {...featured, ...tools}, totalCount }
 }
