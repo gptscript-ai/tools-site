@@ -134,7 +134,7 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
   // Add them to the results so that the ones with the query in the reference come first
   for (const entry of toolEntriesWithReference) {
     const parsedTool = entry.content as Tool[]
-    if (FeaturedTools[entry.reference]) {
+    if (FeaturedTools.has(entry.reference)) {
       featured[entry.reference] = featured[entry.reference] || []
       featured[entry.reference].push(...parsedTool)
     } else {
@@ -145,7 +145,7 @@ export async function getToolsForQuery(query: string, page: number, pageSize: nu
 
   for (const entry of toolEntriesWithDescription) {
     const parsedTool = entry.content as Tool[]
-    if (FeaturedTools[entry.reference]) {
+    if (FeaturedTools.has(entry.reference)) {
       featured[entry.reference] = featured[entry.reference] || []
       featured[entry.reference].push(...parsedTool)
     } else {
