@@ -94,7 +94,7 @@ func reindexRemoteTools(db *sql.DB, apiURL *url.URL) {
 			index         string
 			reference     string
 			content       string
-			description   string
+			description   *string
 			lastIndexedAt string
 			createdAt     string
 			systemTool    bool
