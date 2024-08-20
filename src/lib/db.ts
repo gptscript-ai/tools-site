@@ -79,6 +79,7 @@ export async function upsertToolForUrl(url: string, tools: Tool[], examples: Too
 }
 
 export async function removeToolForUrlIfExists(url: string): Promise<Tool[]> {
+  console.log('Deleting tool for url:', url)
   const toolEntry = await prisma.toolEntry.findFirst({ where: { reference: url } })
 
   if (!toolEntry) {
