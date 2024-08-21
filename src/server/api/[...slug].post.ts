@@ -51,10 +51,11 @@ export default defineEventHandler(async (event) => {
   const [owner, repo, ...subdirs] = url.replace(/^(https?:\/\/)?(www\.)?github\.com\//, '').split('/')
 
   // find the default branch name
-  console.log(`Checking GitHub API for repo ${owner}/${repo}`)
-  const branchResponse = await octokit.request(`GET https://api.github.com/repos/${ owner }/${ repo }`)
-  console.log(`Got response code ${branchResponse.status} from GitHub API`)
-  const branch = branchResponse.data.default_branch
+  let branch = 'main';
+  try {
+    const branchResponse = await octokit.request(`GET https://api.github.com/repos/${ owner }/${ repo }`)
+    branch = branchResponse.data.default_branch
+  } catch (e) {} // don't care about the exception; just fall back to main
 
   // construct the path to the tool.gpt file
   const path = subdirs.length > 0 ? `${ subdirs.join('/') }` : ''
@@ -64,7 +65,6 @@ export default defineEventHandler(async (event) => {
 
   if (!toolResponse.ok) {
     // clean-up any existing tools if the tool.gpt file is no longer found or is private
-    console.log(`Got response code ${toolResponse.status} from raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}/tool.gpt`)
     if (toolResponse.status === 404 || toolResponse.status === 403) {
       await db.removeToolForUrlIfExists(url)
     }
