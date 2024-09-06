@@ -26,7 +26,7 @@ const loading = ref(true)
 const slug = route.params.slug as string[]
 const header = slug[slug.length - 1]
 const path = slug.join('/')
-const usage = `tools: ${ path }`
+const usage = `${ path }`
 const isSysTool = computed(() => slug.length === 1 && slug[0].startsWith('sys.'))
 
 let reference = path
